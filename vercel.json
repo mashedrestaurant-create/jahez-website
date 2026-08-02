@@ -1,0 +1,24 @@
+{
+  "functions": {
+    "app/api/orders/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/payments/paymob/callback/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/customer/orders/route.ts": {
+      "maxDuration": 15
+    },
+    "app/api/customer/orders/[id]/route.ts": {
+      "maxDuration": 15
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
