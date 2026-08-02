@@ -61,7 +61,6 @@ export default function CartPage() {
       ? configuredDeliveryFee
       : 0;
   const estimatedTotal = subtotal + deliveryFee;
-  const appliedPromo: { code: string; discountPercent: number } | null = null;
   const discountAmount = 0;
   const totalWithDiscount = Math.max(0, estimatedTotal - discountAmount);
   const minimumOrder =
@@ -118,7 +117,7 @@ export default function CartPage() {
           ? selectedZone.nameAr
           : selectedZone.nameEn
         : undefined,
-      promoCode: appliedPromo?.code,
+      promoCode: undefined,
       discountAmount,
       language,
       createdAt: confirmedCreatedAt,
@@ -564,18 +563,6 @@ export default function CartPage() {
                     <span>{isArabic ? "رسوم التوصيل" : "Delivery fee"}</span>
                     <b>{formatPrice(deliveryFee)}</b>
                   </div>
-                  {appliedPromo && (
-                    <div className="cart-discount">
-                      <span>
-                        {isArabic
-                          ? `خصم ${appliedPromo.discountPercent}% (${appliedPromo.code})`
-                          : `${appliedPromo.discountPercent}% off (${appliedPromo.code})`}
-                      </span>
-                      <b className="discount-value">
-                        −{formatPrice(discountAmount)}
-                      </b>
-                    </div>
-                  )}
                   <div className="cart-grand-total">
                     <span>{isArabic ? "الإجمالي النهائي" : "Total"}</span>
                     <b>{formatPrice(totalWithDiscount)}</b>

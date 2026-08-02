@@ -1787,7 +1787,7 @@ export function AdminDashboard({
                                   }}
                                 >
                                   <option value="">— اختر تصنيف —</option>
-                                  {categories.filter((c) => c.id !== "offers").map((c) => (
+                                  {categories.map((c) => (
                                     <option value={c.id} key={c.id}>{c.label} · {c.labelEn}</option>
                                   ))}
                                 </select>
