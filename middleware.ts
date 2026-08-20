@@ -1,94 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminSession } from "./app/admin-auth";
+import { prisma } from "./app/lib/prisma";
 
-const configuredAdminHostname = process.env.ADMIN_HOSTNAME?.trim().toLowerCase();
-const ADMIN_HOSTNAMES = new Set([
-  "admin.localhost",
-  ...(configuredAdminHostname ? [configuredAdminHostname] : []),
-]);
+const SESSION_COOKIE = "jahez_admin_session";
+const DRIVER_SESSION_COOKIE = "jahez_driver_session";
 
-function isAdminHost(host: string | null): boolean {
-  if (!host) return false;
-  const hostname = host.split(":")[0];
-  return ADMIN_HOSTNAMES.has(hostname);
+async function isAdminSessionValid(signature: string): Promise<boolean> {
+  const session = await prisma.adminSession.findUnique({
+    where: { token: signature },
+    include: { admin: true },
+  });
+  if (!session) return false;
+  if (session.expiresAt < new Date()) {
+    await prisma.adminSession.delete({ where: { id: session.id } });
+    return false;
+  }
+  return session.admin.isActive;
+}
+
+async function isDriverSessionValid(signature: string): Promise<boolean> {
+  const session = await prisma.driverSession.findUnique({
+    where: { token: signature },
+    include: { driver: true },
+  });
+  if (!session) return false;
+  if (session.expiresAt < new Date()) {
+    await prisma.driverSession.delete({ where: { id: session.id } });
+    return false;
+  }
+  return session.driver.isActive;
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const host = request.headers.get("host");
 
-  if (isAdminHost(host)) {
-    return handleAdminSubdomain(request, pathname);
-  }
-
-  return handleMainSite(request, pathname);
-}
-
-async function handleAdminSubdomain(
-  request: NextRequest,
-  pathname: string,
-): Promise<NextResponse> {
-  // Pass through API routes (they handle their own auth internally)
-  if (pathname.startsWith("/api/")) {
+  if (pathname.startsWith("/_next") || pathname.startsWith("/api")) {
     return NextResponse.next();
   }
 
-  // Pass through Next.js internals
-  if (pathname.startsWith("/_next/")) {
-    return NextResponse.next();
-  }
-
-  // Pass through static files (paths with a file extension)
-  if (/\/[^/]+\.[^/]+$/.test(pathname)) {
-    return NextResponse.next();
-  }
-
-  // Admin login page — allow without auth
-  if (pathname === "/admin/login") {
-    return NextResponse.next();
-  }
-
-  // All other /admin routes — require session
-  if (pathname.startsWith("/admin")) {
-    const session = await getAdminSession(request.cookies);
-    if (!session) {
-      const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/admin/login";
-      return NextResponse.redirect(loginUrl);
+  // Driver routes
+  if (pathname.startsWith("/driver")) {
+    if (pathname === "/driver/login" || pathname === "/driver") {
+      return NextResponse.next();
+    }
+    const sig = request.cookies.get(DRIVER_SESSION_COOKIE)?.value;
+    if (!sig || !(await isDriverSessionValid(sig))) {
+      return NextResponse.redirect(new URL("/driver/login", request.url));
     }
     return NextResponse.next();
   }
 
-  // Any other path (public pages like /, /menu, /about, etc.)
-  // → internal rewrite to /admin/login while preserving the configured admin hostname
-  const rewriteUrl = request.nextUrl.clone();
-  rewriteUrl.pathname = "/admin/login";
-  return NextResponse.rewrite(rewriteUrl);
-}
-
-async function handleMainSite(
-  request: NextRequest,
-  pathname: string,
-): Promise<NextResponse> {
-  // Allow login page, login API, and logout API without auth
-  if (
-    pathname === "/admin/login" ||
-    pathname === "/api/admin/login" ||
-    pathname === "/api/admin/logout"
-  ) {
+  // Admin routes
+  if (pathname === "/admin/login") {
     return NextResponse.next();
   }
 
-  // Protect /admin and /api/admin* routes
-  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-    const session = await getAdminSession(request.cookies);
-    if (!session) {
-      if (pathname.startsWith("/api/")) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-      const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/admin/login";
-      return NextResponse.redirect(loginUrl);
+  if (pathname.startsWith("/admin")) {
+    const sig = request.cookies.get(SESSION_COOKIE)?.value;
+    if (!sig || !(await isAdminSessionValid(sig))) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
 
@@ -96,5 +65,5 @@ async function handleMainSite(
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|assets).*)"],
 };
