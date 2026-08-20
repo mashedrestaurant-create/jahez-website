@@ -11,6 +11,29 @@ export type ManagedProduct = Product & {
   custom?: boolean;
 };
 
+export type CategoryMedia = {
+  slug: string;
+  image?: string;
+  videoUrl?: string;
+};
+
+export async function loadCategoryMedia(): Promise<Record<string, CategoryMedia>> {
+  try {
+    const dbCats = await prisma.category.findMany();
+    const map: Record<string, CategoryMedia> = {};
+    for (const c of dbCats) {
+      map[c.slug] = {
+        slug: c.slug,
+        image: c.imageId || undefined,
+        videoUrl: c.videoUrl || undefined,
+      };
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 export async function loadManagedProducts(includeInactive = false): Promise<ManagedProduct[]> {
   try {
     const dbProducts = await prisma.product.findMany({
@@ -21,9 +44,9 @@ export async function loadManagedProducts(includeInactive = false): Promise<Mana
 
     if (dbProducts.length === 0) return defaultProducts.map(p => ({ ...p, active: true }));
 
-    const categorySlugMap: Record<string, CategoryId> = {};
+    const catSlugToId: Record<string, CategoryId> = {};
     for (const cat of categories) {
-      categorySlugMap[cat.id] = cat.id;
+      catSlugToId[cat.id] = cat.id;
     }
 
     const catIdToSlug: Record<string, string> = {};
@@ -34,7 +57,7 @@ export async function loadManagedProducts(includeInactive = false): Promise<Mana
 
     return dbProducts.map((p) => {
       const slug = catIdToSlug[p.categoryId] || "poultry";
-      const catId: CategoryId = (categorySlugMap[slug] || "poultry") as CategoryId;
+      const catId: CategoryId = (catSlugToId[slug] || "poultry") as CategoryId;
       const fallback = defaultProducts.find((d) => d.id.toLowerCase() === p.slug);
 
       return {

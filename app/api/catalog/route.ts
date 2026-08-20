@@ -1,5 +1,5 @@
 import { getPaymobConfig } from "../../paymob";
-import { loadManagedProducts } from "../../server-catalog";
+import { loadManagedProducts, loadCategoryMedia } from "../../server-catalog";
 import { products as defaultProducts } from "../../data";
 import { defaultSettings } from "../../settings";
 import { loadSiteSettings } from "../../server-settings";
@@ -8,10 +8,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const [settings, products, paymobConfig] = await Promise.all([
+    const [settings, products, paymobConfig, categoryMedia] = await Promise.all([
       loadSiteSettings(),
       loadManagedProducts(),
       getPaymobConfig(),
+      loadCategoryMedia(),
     ]);
     return Response.json(
       {
@@ -23,6 +24,7 @@ export async function GET() {
               : "false",
         },
         products,
+        categoryMedia,
       },
       {
         headers: {
@@ -36,6 +38,7 @@ export async function GET() {
       {
         settings: defaultSettings,
         products: defaultProducts,
+        categoryMedia: {},
       },
       {
         headers: {

@@ -14,7 +14,7 @@ import { PlainImage as Image } from "../plain-image";
 
 export default function MenuPage() {
   const { isArabic, t } = useLanguage();
-  const { products } = useCatalog();
+  const { products, categoryMedia } = useCatalog();
   const [active, setActive] = useState<CategoryId | "all">("all");
   const [query, setQuery] = useState("");
   const { addItem } = useCart();
@@ -116,12 +116,28 @@ export default function MenuPage() {
               {grouped.map((category) => (
                 <section className="menu-category" id={category.id} key={category.id}>
                   <div className="category-showcase">
-                    <Image
-                      src={category.image}
-                      alt={isArabic ? category.label : category.labelEn}
-                      fill
-                      sizes="(max-width: 760px) 92vw, 32vw"
-                    />
+                    {categoryMedia[category.id]?.videoUrl ? (
+                      categoryMedia[category.id].videoUrl!.includes("youtube.com") || categoryMedia[category.id].videoUrl!.includes("youtu.be") ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${categoryMedia[category.id].videoUrl!.includes("youtu.be") ? categoryMedia[category.id].videoUrl!.split("/").pop()?.split("?")[0] : new URL(categoryMedia[category.id].videoUrl!).searchParams.get("v")}`}
+                          className="absolute inset-0 w-full h-full"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video
+                          src={categoryMedia[category.id].videoUrl}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          autoPlay loop muted playsInline
+                        />
+                      )
+                    ) : (
+                      <Image
+                        src={categoryMedia[category.id]?.image || category.image}
+                        alt={isArabic ? category.label : category.labelEn}
+                        fill
+                        sizes="(max-width: 760px) 92vw, 32vw"
+                      />
+                    )}
                     <div className="category-showcase-overlay" />
                     <div>
                       <h2>{isArabic ? category.label : category.labelEn}</h2>

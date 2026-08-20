@@ -11,9 +11,12 @@ import {
 import { products as defaultProducts, type Product } from "./data";
 import { defaultSettings, type SiteSettings } from "./settings";
 
+export type CategoryMedia = Record<string, { slug: string; image?: string; videoUrl?: string }>;
+
 type CatalogContextValue = {
   products: Product[];
   settings: SiteSettings;
+  categoryMedia: CategoryMedia;
 };
 
 const CatalogContext = createContext<CatalogContextValue | null>(null);
@@ -21,6 +24,7 @@ const CatalogContext = createContext<CatalogContextValue | null>(null);
 export function CatalogProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState(defaultProducts);
   const [settings, setSettings] = useState(defaultSettings);
+  const [categoryMedia, setCategoryMedia] = useState<CategoryMedia>({});
 
   useEffect(() => {
     let active = true;
@@ -34,33 +38,25 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         if (Array.isArray(payload.products)) {
           setProducts(payload.products);
         }
+        if (payload.categoryMedia) {
+          setCategoryMedia(payload.categoryMedia);
+        }
       })
-      .catch(() => {
-        // The static catalog remains available if the data service is offline.
-      });
+      .catch(() => {});
     return () => {
       active = false;
     };
   }, []);
 
   useEffect(() => {
-    document.documentElement.style.setProperty(
-      "--teal",
-      settings.primaryColor,
-    );
-    document.documentElement.style.setProperty(
-      "--orange",
-      settings.accentColor,
-    );
-    document.documentElement.style.setProperty(
-      "--cream",
-      settings.creamColor,
-    );
+    document.documentElement.style.setProperty("--teal", settings.primaryColor);
+    document.documentElement.style.setProperty("--orange", settings.accentColor);
+    document.documentElement.style.setProperty("--cream", settings.creamColor);
   }, [settings]);
 
   const value = useMemo(
-    () => ({ products, settings }),
-    [products, settings],
+    () => ({ products, settings, categoryMedia }),
+    [products, settings, categoryMedia],
   );
 
   return (

@@ -9,6 +9,8 @@ type Category = {
   slug?: string;
   descriptionAr?: string;
   descriptionEn?: string;
+  imageId?: string;
+  videoUrl?: string;
   icon?: string;
   sortOrder?: number;
   active?: boolean;
@@ -21,6 +23,8 @@ type FormState = {
   slug: string;
   descriptionAr: string;
   descriptionEn: string;
+  imageId: string;
+  videoUrl: string;
   icon: string;
   sortOrder: string;
   active: boolean;
@@ -28,8 +32,90 @@ type FormState = {
 
 const EMPTY_FORM: FormState = {
   id: "", nameAr: "", nameEn: "", slug: "", descriptionAr: "", descriptionEn: "",
-  icon: "", sortOrder: "0", active: true,
+  imageId: "", videoUrl: "", icon: "", sortOrder: "0", active: true,
 };
+
+function MediaUpload({ imageValue, videoValue, onImageChange, onVideoChange }: {
+  imageValue: string; videoValue: string;
+  onImageChange: (url: string) => void; onVideoChange: (url: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const upload = async (file: File) => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const d = await res.json();
+      if (d.ok) onImageChange(d.url);
+    } catch {}
+    setUploading(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) upload(file);
+  };
+
+  return (
+    <div className="space-y-3">
+      {/* Image upload */}
+      <div
+        className={`relative border-2 border-dashed rounded-xl p-4 text-center transition-colors cursor-pointer ${dragOver ? "border-[#c9a23b] bg-[#c9a23b]/5" : "border-gray-200 hover:border-gray-300"}`}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+      >
+        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) upload(file);
+        }} />
+        {imageValue ? (
+          <div className="relative inline-block">
+            <img src={imageValue} alt="" className="h-24 w-40 object-cover rounded-lg" />
+            <button
+              onClick={(e) => { e.stopPropagation(); onImageChange(""); }}
+              className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+            >✕</button>
+          </div>
+        ) : (
+          <p className="text-sm" style={{ color: "#6b7280" }}>{uploading ? "جاري الرفع..." : "اسحب صورة القسم هنا أو اضغط للتحميل"}</p>
+        )}
+      </div>
+
+      {/* Video URL */}
+      <div>
+        <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>رابط فيديو (YouTube / MP4) — اختياري</label>
+        <input
+          dir="ltr"
+          value={videoValue}
+          onChange={(e) => onVideoChange(e.target.value)}
+          placeholder="https://youtube.com/watch?v=... أو https://example.com/video.mp4"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#c9a23b] focus:border-transparent"
+        />
+        {videoValue && (
+          <div className="mt-2">
+            {videoValue.includes("youtube.com") || videoValue.includes("youtu.be") ? (
+              <iframe
+                src={`https://www.youtube.com/embed/${videoValue.includes("youtu.be") ? videoValue.split("/").pop()?.split("?")[0] : new URL(videoValue).searchParams.get("v")}`}
+                className="w-full h-40 rounded-lg"
+                allowFullScreen
+              />
+            ) : (
+              <video src={videoValue} className="w-full h-40 rounded-lg object-cover" controls />
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function CategoriesTab() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -69,11 +155,11 @@ export function CategoriesTab() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           id: form.id || undefined,
-          nameAr: form.nameAr,
-          nameEn: form.nameEn,
-          slug: form.slug,
+          nameAr: form.nameAr, nameEn: form.nameEn, slug: form.slug,
           descriptionAr: form.descriptionAr || undefined,
           descriptionEn: form.descriptionEn || undefined,
+          imageId: form.imageId || undefined,
+          videoUrl: form.videoUrl || undefined,
           icon: form.icon || undefined,
           sortOrder: Number(form.sortOrder) || 0,
           active: form.active,
@@ -99,13 +185,14 @@ export function CategoriesTab() {
     setForm({
       id: c.id, nameAr: c.nameAr || "", nameEn: c.nameEn || "", slug: c.slug || "",
       descriptionAr: c.descriptionAr || "", descriptionEn: c.descriptionEn || "",
+      imageId: c.imageId || "", videoUrl: c.videoUrl || "",
       icon: c.icon || "", sortOrder: String(c.sortOrder ?? 0), active: c.active !== false,
     });
     setShowModal(true);
   };
 
   return (
-    <div dir="rtl" className="space-y-4 p-1">
+    <div dir="rtl" className="space-y-4 p-1" style={{ fontFamily: "Cairo, sans-serif" }}>
       {notice && (
         <div className="rounded-xl border border-gray-100 bg-white px-5 py-3 text-sm font-bold shadow-sm" style={{ color: "#0a2d1d" }}>
           {notice}
@@ -124,13 +211,21 @@ export function CategoriesTab() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setShowModal(false)}>
-          <div
-            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="mb-4 text-base font-bold" style={{ color: "#0a2d1d" }}>
               {form.id ? "تعديل القسم" : "إضافة قسم جديد"}
             </h3>
+
+            <div className="mb-4">
+              <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>صورة / فيديو القسم</label>
+              <MediaUpload
+                imageValue={form.imageId}
+                videoValue={form.videoUrl}
+                onImageChange={(url) => setForm({ ...form, imageId: url })}
+                onVideoChange={(url) => setForm({ ...form, videoUrl: url })}
+              />
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>الاسم بالعربي *</label>
@@ -146,7 +241,7 @@ export function CategoriesTab() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>الأيقونة</label>
-                <input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} placeholder="🍔" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#c9a23b]" />
+                <input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} placeholder="🐔" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#c9a23b]" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>الترتيب</label>
@@ -154,11 +249,7 @@ export function CategoriesTab() {
               </div>
               <div className="flex items-end">
                 <label className="flex cursor-pointer items-center gap-2">
-                  <div
-                    className={`relative h-5 w-10 rounded-full transition-colors ${form.active ? "" : "bg-gray-300"}`}
-                    style={form.active ? { background: "#0a2d1d" } : {}}
-                    onClick={() => setForm({ ...form, active: !form.active })}
-                  >
+                  <div className={`relative h-5 w-10 rounded-full transition-colors ${form.active ? "" : "bg-gray-300"}`} style={form.active ? { background: "#0a2d1d" } : {}} onClick={() => setForm({ ...form, active: !form.active })}>
                     <div className={`absolute right-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.active ? "right-5" : "right-0.5"}`} />
                   </div>
                   <span className="text-xs font-bold" style={{ color: "#374151" }}>نشط</span>
@@ -200,11 +291,16 @@ export function CategoriesTab() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((c) => (
             <div key={c.id} className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-24 items-center justify-center" style={{ background: "#f9fafb" }}>
-                {c.icon ? (
-                  <span className="text-4xl">{c.icon}</span>
+              <div className="h-32 relative overflow-hidden" style={{ background: "#f9fafb" }}>
+                {c.imageId ? (
+                  <img src={c.imageId} alt="" className="w-full h-full object-cover" />
+                ) : c.icon ? (
+                  <div className="flex h-full items-center justify-center"><span className="text-4xl">{c.icon}</span></div>
                 ) : (
-                  <span className="text-3xl text-gray-200">📁</span>
+                  <div className="flex h-full items-center justify-center"><span className="text-3xl text-gray-200">📁</span></div>
+                )}
+                {c.videoUrl && (
+                  <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">🎬 فيديو</div>
                 )}
               </div>
               <div className="space-y-2 p-4">
@@ -215,11 +311,7 @@ export function CategoriesTab() {
                   </span>
                 </div>
                 {c.nameEn && <p className="text-xs" dir="ltr" style={{ color: "#9ca3af" }}>{c.nameEn}</p>}
-                <p className="text-xs" style={{ color: "#9ca3af" }}>slug: {c.slug}</p>
                 {c.descriptionAr && <p className="text-xs" style={{ color: "#6b7280" }}>{c.descriptionAr}</p>}
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="text-xs" style={{ color: "#9ca3af" }}>الترتيب: {c.sortOrder ?? 0}</span>
-                </div>
                 <button onClick={() => startEdit(c)} className="rounded-lg px-3 py-1.5 text-xs font-bold transition-colors hover:bg-gray-100" style={{ color: "#c9a23b" }}>
                   تعديل
                 </button>

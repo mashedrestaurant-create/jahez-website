@@ -65,6 +65,7 @@ model Category {
   descriptionAr String?
   descriptionEn String?
   imageId      String?
+  videoUrl     String?
   icon         String?
   sortOrder    Int      @default(0)
   active       Boolean  @default(true)
