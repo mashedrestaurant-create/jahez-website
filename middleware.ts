@@ -1,36 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "./app/lib/prisma";
 
 const SESSION_COOKIE = "jahez_admin_session";
 const DRIVER_SESSION_COOKIE = "jahez_driver_session";
 
-async function isAdminSessionValid(signature: string): Promise<boolean> {
-  const session = await prisma.adminSession.findUnique({
-    where: { token: signature },
-    include: { admin: true },
-  });
-  if (!session) return false;
-  if (session.expiresAt < new Date()) {
-    await prisma.adminSession.delete({ where: { id: session.id } });
-    return false;
+function parseCookies(header: string | null): Record<string, string> {
+  const map: Record<string, string> = {};
+  if (!header) return map;
+  for (const pair of header.split(";")) {
+    const [key, ...rest] = pair.split("=");
+    if (key) map[key.trim()] = rest.join("=").trim();
   }
-  return session.admin.isActive;
+  return map;
 }
 
-async function isDriverSessionValid(signature: string): Promise<boolean> {
-  const session = await prisma.driverSession.findUnique({
-    where: { token: signature },
-    include: { driver: true },
-  });
-  if (!session) return false;
-  if (session.expiresAt < new Date()) {
-    await prisma.driverSession.delete({ where: { id: session.id } });
-    return false;
-  }
-  return session.driver.isActive;
-}
-
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/_next") || pathname.startsWith("/api")) {
@@ -42,8 +25,9 @@ export async function middleware(request: NextRequest) {
     if (pathname === "/driver/login" || pathname === "/driver") {
       return NextResponse.next();
     }
-    const sig = request.cookies.get(DRIVER_SESSION_COOKIE)?.value;
-    if (!sig || !(await isDriverSessionValid(sig))) {
+    const cookies = parseCookies(request.headers.get("cookie"));
+    const sig = cookies[DRIVER_SESSION_COOKIE];
+    if (!sig) {
       return NextResponse.redirect(new URL("/driver/login", request.url));
     }
     return NextResponse.next();
@@ -55,8 +39,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin")) {
-    const sig = request.cookies.get(SESSION_COOKIE)?.value;
-    if (!sig || !(await isAdminSessionValid(sig))) {
+    const cookies = parseCookies(request.headers.get("cookie"));
+    const sig = cookies[SESSION_COOKIE];
+    if (!sig) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
   }
