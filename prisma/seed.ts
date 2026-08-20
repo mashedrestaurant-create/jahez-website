@@ -40,37 +40,65 @@ const REAL_CATEGORIES = [
 ];
 
 const REAL_PRODUCTS = [
-  { id: "chicken-fajita", categorySlug: "poultry", nameAr: "فاهيتا دجاج", nameEn: "Chicken Fajita", descriptionAr: "شرائح دجاج متبلة بنكهة الفاهيتا وجاهزة للتسوية.", descriptionEn: "Seasoned chicken strips prepared in fajita style and ready to cook.", unit: "كيلو كامل", price: 450, featured: true, spicy: false, image: "/assets/jahez/hero-chicken.jpg" },
-  { id: "chicken-curry", categorySlug: "poultry", nameAr: "دجاج بالكاري", nameEn: "Chicken Curry", descriptionAr: "قطع دجاج متبلة بالكاري ومجهزة لوجبة سريعة بطعم غني.", descriptionEn: "Curry-seasoned chicken prepared for a quick, flavorful meal.", unit: "كيلو كامل", price: 450, featured: false, spicy: false, image: "" },
-  { id: "oregano-chicken-fillet", categorySlug: "poultry", nameAr: "فيليه دجاج أوريجانو", nameEn: "Oregano Chicken Fillet", descriptionAr: "فيليه دجاج متبل بالأوريجانو والبهارات وجاهز للشوي أو الطهي.", descriptionEn: "Chicken fillet seasoned with oregano and spices, ready to grill or cook.", unit: "كيلو كامل", price: 450, featured: true, spicy: false, image: "" },
-  { id: "breaded-chicken", categorySlug: "poultry", nameAr: "تشيكن بانيه", nameEn: "Breaded Chicken", descriptionAr: "شرائح دجاج بانيه متبلة ومجهزة للقلي أو التسوية في الفرن.", descriptionEn: "Seasoned breaded chicken slices ready to fry or oven-cook.", unit: "كيلو كامل", price: 500, featured: false, spicy: false, image: "" },
-  { id: "tandoori-chicken", categorySlug: "poultry", nameAr: "دجاج تندوري", nameEn: "Tandoori Chicken", descriptionAr: "دجاج متبل بخليط تندوري متوازن وجاهز للتسوية.", descriptionEn: "Chicken seasoned with a balanced tandoori blend and ready to cook.", unit: "كيلو كامل", price: 450, featured: false, spicy: false, image: "" },
-  { id: "crispy-chicken", categorySlug: "poultry", nameAr: "كريسبي دجاج", nameEn: "Crispy Chicken", descriptionAr: "قطع دجاج كريسبي متبلة ومجهزة للقلي.", descriptionEn: "Seasoned crispy chicken pieces prepared for frying.", unit: "كيلو كامل", price: 450, featured: false, spicy: false, image: "" },
-  { id: "shish-tawook", categorySlug: "poultry", nameAr: "شيش طاووق", nameEn: "Shish Tawook", descriptionAr: "مكعبات دجاج متبلة بتتبيلة شيش طاووق وجاهزة للشوي.", descriptionEn: "Chicken cubes in a shish tawook marinade, ready to grill.", unit: "كيلو كامل", price: 440, featured: false, spicy: false, image: "" },
-  { id: "hot-nashville-chicken", categorySlug: "poultry", nameAr: "هوت ناشفيل تشيكن", nameEn: "Hot Nashville Chicken", descriptionAr: "دجاج متبل بنكهة ناشفيل الحارة ومجهز للقلي.", descriptionEn: "Chicken seasoned with a hot Nashville-style blend and ready to fry.", unit: "كيلو كامل", price: 450, featured: false, spicy: true, image: "" },
-
-  { id: "beef-shawarma", categorySlug: "beef", nameAr: "شاورما لحم", nameEn: "Beef Shawarma", descriptionAr: "شرائح لحم متبلة بتتبيلة الشاورما وجاهزة للتسوية.", descriptionEn: "Beef strips seasoned in shawarma style and ready to cook.", unit: "كيلو كامل", price: 750, featured: true, spicy: false, image: "" },
-  { id: "kofta", categorySlug: "beef", nameAr: "كفتة", nameEn: "Kofta", descriptionAr: "كفتة متبلة ومشكلة وجاهزة للشوي أو الطهي.", descriptionEn: "Seasoned shaped kofta ready to grill or cook.", unit: "كيلو كامل", price: 680, featured: false, spicy: false, image: "" },
-  { id: "beef-burger", categorySlug: "beef", nameAr: "برجر لحم", nameEn: "Beef Burger", descriptionAr: "برجر لحم متبل ومشكل وجاهز للتسوية.", descriptionEn: "Seasoned beef burger patties prepared and ready to cook.", unit: "كيلو كامل", price: 630, featured: false, spicy: false, image: "" },
-  { id: "mini-burger", categorySlug: "beef", nameAr: "ميني برجر", nameEn: "Mini Burger", descriptionAr: "قطع ميني برجر لحم مناسبة للوجبات السريعة والعائلية.", descriptionEn: "Mini beef burger patties suited for quick family meals.", unit: "كيلو كامل", price: 630, featured: false, spicy: false, image: "" },
-  { id: "soy-ginger-beef", categorySlug: "beef", nameAr: "لحم صويا وجنزبيل", nameEn: "Soy & Ginger Beef", descriptionAr: "شرائح لحم متبلة بالصويا والجنزبيل وجاهزة للطهي السريع.", descriptionEn: "Beef strips marinated with soy and ginger, ready for quick cooking.", unit: "كيلو كامل", price: 750, featured: false, spicy: false, image: "" },
-  { id: "beef-teriyaki", categorySlug: "beef", nameAr: "بيف ترياكي", nameEn: "Beef Teriyaki", descriptionAr: "شرائح لحم بتتبيلة ترياكي متوازنة وجاهزة للتسوية.", descriptionEn: "Beef strips in a balanced teriyaki marinade, ready to cook.", unit: "كيلو كامل", price: 750, featured: false, spicy: false, image: "" },
-  { id: "spicy-cajun-beef", categorySlug: "beef", nameAr: "بيف كاجن حار", nameEn: "Spicy Cajun Beef", descriptionAr: "شرائح لحم متبلة بالكاجن الحار وجاهزة للتسوية.", descriptionEn: "Beef strips in a spicy Cajun seasoning, ready to cook.", unit: "كيلو كامل", price: 750, featured: false, spicy: true, image: "" },
-  { id: "sweet-chili-beef", categorySlug: "beef", nameAr: "بيف سويت تشيلي", nameEn: "Sweet Chili Beef", descriptionAr: "شرائح لحم بتتبيلة سويت تشيلي وجاهزة للطهي.", descriptionEn: "Beef strips in a sweet chili marinade, ready to cook.", unit: "كيلو كامل", price: 750, featured: false, spicy: false, image: "" },
-
-  { id: "beef-bolognese", categorySlug: "cooked-meals", nameAr: "صوص بولونيز باللحم", nameEn: "Beef Bolognese Sauce", descriptionAr: "صوص بولونيز باللحم مطهي وجاهز للتسخين والتقديم مع المكرونة.", descriptionEn: "Cooked beef bolognese sauce, ready to heat and serve with pasta.", unit: "كيلو كامل", price: 550, featured: true, spicy: false, image: "" },
-
-  { id: "stuffed-vine-leaves", categorySlug: "ready-meals", nameAr: "ورق عنب محشي", nameEn: "Stuffed Vine Leaves", descriptionAr: "ورق عنب محشي ومجهز حسب الطلب.", descriptionEn: "Stuffed vine leaves prepared to order.", unit: "كيلو كامل", price: 260, featured: true, spicy: false, image: "/assets/jahez/ready-meals.jpg" },
-  { id: "beef-goulash", categorySlug: "ready-meals", nameAr: "جلاش باللحم", nameEn: "Beef Goulash", descriptionAr: "صينية جلاش محشية باللحم ومجهزة للتسوية.", descriptionEn: "A tray of beef-filled goulash prepared and ready to bake.", unit: "صينية", price: 470, featured: false, spicy: false, image: "" },
-  { id: "lasagna", categorySlug: "ready-meals", nameAr: "لازانيا", nameEn: "Lasagna", descriptionAr: "صينية لازانيا مجهزة للتسوية والتقديم.", descriptionEn: "A prepared lasagna tray ready to bake and serve.", unit: "صينية", price: 600, featured: false, spicy: false, image: "" },
-  { id: "bechamel-pasta", categorySlug: "ready-meals", nameAr: "مكرونة بشاميل", nameEn: "Bechamel Pasta", descriptionAr: "صينية مكرونة بشاميل مجهزة للتسوية.", descriptionEn: "A prepared bechamel pasta tray ready to bake.", unit: "صينية", price: 600, featured: false, spicy: false, image: "" },
-
-  { id: "vegetable-spring-rolls", categorySlug: "appetizers", nameAr: "سبرينج رول خضار", nameEn: "Vegetable Spring Rolls", descriptionAr: "سبرينج رول بحشوة خضار، مجهز للقلي.", descriptionEn: "Vegetable-filled spring rolls prepared for frying.", unit: "عبوة 15 قطعة", price: 180, featured: false, spicy: false, image: "/assets/jahez/appetizers.jpg" },
-  { id: "chicken-spring-rolls", categorySlug: "appetizers", nameAr: "سبرينج رول دجاج", nameEn: "Chicken Spring Rolls", descriptionAr: "سبرينج رول بحشوة دجاج، مجهز للقلي.", descriptionEn: "Chicken-filled spring rolls prepared for frying.", unit: "عبوة 15 قطعة", price: 200, featured: false, spicy: false, image: "" },
-  { id: "beef-sambousek", categorySlug: "appetizers", nameAr: "سمبوسك لحم", nameEn: "Beef Sambousek", descriptionAr: "سمبوسك بحشوة لحم، مجهز للقلي أو الخَبز.", descriptionEn: "Beef-filled sambousek prepared for frying or baking.", unit: "عبوة 15 قطعة", price: 200, featured: false, spicy: false, image: "" },
-  { id: "cheese-sambousek", categorySlug: "appetizers", nameAr: "سمبوسك جبنة", nameEn: "Cheese Sambousek", descriptionAr: "سمبوسك بحشوة جبنة، مجهز للقلي أو الخَبز.", descriptionEn: "Cheese-filled sambousek prepared for frying or baking.", unit: "عبوة 15 قطعة", price: 150, featured: false, spicy: false, image: "" },
-  { id: "chicken-sambousek", categorySlug: "appetizers", nameAr: "سمبوسك دجاج", nameEn: "Chicken Sambousek", descriptionAr: "سمبوسك بحشوة دجاج، مجهز للقلي أو الخَبز.", descriptionEn: "Chicken-filled sambousek prepared for frying or baking.", unit: "عبوة 15 قطعة", price: 200, featured: false, spicy: false, image: "" },
+  { id: "chicken-fajita", cat: "poultry", ar: "فاهيتا دجاج", en: "Chicken Fajita", desc: "شرائح دجاج متبلة بنكهة الفاهيتا وجاهزة للتسوية.", unit: "كيلو كامل", price: 450, feat: true, spicy: false, img: "/assets/jahez/hero-chicken.jpg" },
+  { id: "chicken-curry", cat: "poultry", ar: "دجاج بالكاري", en: "Chicken Curry", desc: "قطع دجاج متبلة بالكاري ومجهزة لوجبة سريعة بطعم غني.", unit: "كيلو كامل", price: 450, feat: false, spicy: false, img: "" },
+  { id: "oregano-chicken-fillet", cat: "poultry", ar: "فيليه دجاج أوريجانو", en: "Oregano Chicken Fillet", desc: "فيليه دجاج متبل بالأوريجانو والبهارات.", unit: "كيلو كامل", price: 450, feat: true, spicy: false, img: "" },
+  { id: "breaded-chicken", cat: "poultry", ar: "تشيكن بانيه", en: "Breaded Chicken", desc: "شرائح دجاج بانيه متبلة ومجهزة للقلي.", unit: "كيلو كامل", price: 500, feat: false, spicy: false, img: "" },
+  { id: "tandoori-chicken", cat: "poultry", ar: "دجاج تندوري", en: "Tandoori Chicken", desc: "دجاج متبل بخليط تندوري متوازن.", unit: "كيلو كامل", price: 450, feat: false, spicy: false, img: "" },
+  { id: "crispy-chicken", cat: "poultry", ar: "كريسبي دجاج", en: "Crispy Chicken", desc: "قطع دجاج كريسبي متبلة ومجهزة للقلي.", unit: "كيلو كامل", price: 450, feat: false, spicy: false, img: "" },
+  { id: "shish-tawook", cat: "poultry", ar: "شيش طاووق", en: "Shish Tawook", desc: "مكعبات دجاج متبلة بتتبيلة شيش طاووق.", unit: "كيلو كامل", price: 440, feat: false, spicy: false, img: "" },
+  { id: "hot-nashville-chicken", cat: "poultry", ar: "هوت ناشفيل تشيكن", en: "Hot Nashville Chicken", desc: "دجاج متبل بنكهة ناشفيل الحارة.", unit: "كيلو كامل", price: 450, feat: false, spicy: true, img: "" },
+  { id: "beef-shawarma", cat: "beef", ar: "شاورما لحم", en: "Beef Shawarma", desc: "شرائح لحم متبلة بتتبيلة الشاورما.", unit: "كيلو كامل", price: 750, feat: true, spicy: false, img: "" },
+  { id: "kofta", cat: "beef", ar: "كفتة", en: "Kofta", desc: "كفتة متبلة ومشكلة وجاهزة للشوي.", unit: "كيلو كامل", price: 680, feat: false, spicy: false, img: "" },
+  { id: "beef-burger", cat: "beef", ar: "برجر لحم", en: "Beef Burger", desc: "برجر لحم متبل ومشكل.", unit: "كيلو كامل", price: 630, feat: false, spicy: false, img: "" },
+  { id: "mini-burger", cat: "beef", ar: "ميني برجر", en: "Mini Burger", desc: "قطع ميني برجر لحم.", unit: "كيلو كامل", price: 630, feat: false, spicy: false, img: "" },
+  { id: "soy-ginger-beef", cat: "beef", ar: "لحم صويا وجنزبيل", en: "Soy & Ginger Beef", desc: "شرائح لحم متبلة بالصويا والجنزبيل.", unit: "كيلو كامل", price: 750, feat: false, spicy: false, img: "" },
+  { id: "beef-teriyaki", cat: "beef", ar: "بيف ترياكي", en: "Beef Teriyaki", desc: "شرائح لحم بتتبيلة ترياكي.", unit: "كيلو كامل", price: 750, feat: false, spicy: false, img: "" },
+  { id: "spicy-cajun-beef", cat: "beef", ar: "بيف كاجن حار", en: "Spicy Cajun Beef", desc: "شرائح لحم متبلة بالكاجن الحار.", unit: "كيلو كامل", price: 750, feat: false, spicy: true, img: "" },
+  { id: "sweet-chili-beef", cat: "beef", ar: "بيف سويت تشيلي", en: "Sweet Chili Beef", desc: "شرائح لحم بتتبيلة سويت تشيلي.", unit: "كيلو كامل", price: 750, feat: false, spicy: false, img: "" },
+  { id: "beef-bolognese", cat: "cooked-meals", ar: "صوص بولونيز باللحم", en: "Beef Bolognese Sauce", desc: "صوص بولونيز باللحم مطهي وجاهز.", unit: "كيلو كامل", price: 550, feat: true, spicy: false, img: "" },
+  { id: "stuffed-vine-leaves", cat: "ready-meals", ar: "ورق عنب محشي", en: "Stuffed Vine Leaves", desc: "ورق عنب محشي ومجهز حسب الطلب.", unit: "كيلو كامل", price: 260, feat: true, spicy: false, img: "/assets/jahez/ready-meals.jpg" },
+  { id: "beef-goulash", cat: "ready-meals", ar: "جلاش باللحم", en: "Beef Goulash", desc: "صينية جلاش محشية باللحم.", unit: "صينية", price: 470, feat: false, spicy: false, img: "" },
+  { id: "lasagna", cat: "ready-meals", ar: "لازانيا", en: "Lasagna", desc: "صينية لازانيا مجهزة.", unit: "صينية", price: 600, feat: false, spicy: false, img: "" },
+  { id: "bechamel-pasta", cat: "ready-meals", ar: "مكرونة بشاميل", en: "Bechamel Pasta", desc: "صينية مكرونة بشاميل مجهزة.", unit: "صينية", price: 600, feat: false, spicy: false, img: "" },
+  { id: "vegetable-spring-rolls", cat: "appetizers", ar: "سبرينج رول خضار", en: "Vegetable Spring Rolls", desc: "سبرينج رول بحشوة خضار.", unit: "عبوة 15 قطعة", price: 180, feat: false, spicy: false, img: "/assets/jahez/appetizers.jpg" },
+  { id: "chicken-spring-rolls", cat: "appetizers", ar: "سبرينج رول دجاج", en: "Chicken Spring Rolls", desc: "سبرينج رول بحشوة دجاج.", unit: "عبوة 15 قطعة", price: 200, feat: false, spicy: false, img: "" },
+  { id: "beef-sambousek", cat: "appetizers", ar: "سمبوسك لحم", en: "Beef Sambousek", desc: "سمبوسك بحشوة لحم.", unit: "عبوة 15 قطعة", price: 200, feat: false, spicy: false, img: "" },
+  { id: "cheese-sambousek", cat: "appetizers", ar: "سمبوسك جبنة", en: "Cheese Sambousek", desc: "سمبوسك بحشوة جبنة.", unit: "عبوة 15 قطعة", price: 150, feat: false, spicy: false, img: "" },
+  { id: "chicken-sambousek", cat: "appetizers", ar: "سمبوسك دجاج", en: "Chicken Sambousek", desc: "سمبوسك بحشوة دجاج.", unit: "عبوة 15 قطعة", price: 200, feat: false, spicy: false, img: "" },
 ];
+
+const SITE_SETTINGS: Record<string, string> = {
+  phone: "01577793871",
+  email: "info@jahez.com",
+  whatsapp: "+201577793871",
+  whatsappNumber: "+201577793871",
+  address: "المعادي، القاهرة، مصر",
+  siteNameAr: "جاهز",
+  siteNameEn: "Jahez",
+  logo: "/logo.png",
+  heroTitleAr: "أكل بيتي أصيل",
+  heroTitleEn: "Authentic Homemade Food",
+  heroSubtitleAr: "تقدمالك أشهي المأكولات العربية",
+  heroSubtitleEn: "Serving you the finest Arabic cuisine",
+  taglineAr: "أكل البيت من غير وقت التحضير — منتجات ووجبات مجهزة بعناية.",
+  taglineEn: "Homestyle meals without the prep time — carefully prepared products ordered 24 hours ahead.",
+  openingHours: "Sat-Thu: 11AM-11PM, Fri: 2PM-12AM",
+  openTime: "09:00",
+  closeTime: "21:00",
+  deliveryFee: "0",
+  minimumOrder: "0",
+  freeDeliveryThreshold: "0",
+  orderLeadHours: "24",
+  cashOnDeliveryEnabled: "true",
+  instapayEnabled: "false",
+  instapayAccount: "",
+  instapayPaymentLink: "",
+  paymobEnabled: "false",
+  primaryColor: "#0A2D1D",
+  accentColor: "#C9A23B",
+  creamColor: "#F7F0DF",
+};
 
 async function main() {
   console.log("Seeding database...");
@@ -81,12 +109,7 @@ async function main() {
   await skipDuplicates(() => prisma.adminUser.create({ data: { username: "receiver", name: "مستقبل الطلبات", email: "receiver@example.com", passwordHash: hashSync("Admin@123456", 10), role: "order_receiver", isActive: true } }));
   console.log("Admin users done");
 
-  // ── Drivers ──
-  await skipDuplicates(() => prisma.driver.create({ data: { name: "أحمد محمد", phone: "01012345678", phoneNorm: "01012345678", passwordHash: hashSync("Driver@123", 10), isActive: true, isOnline: false, rating: 4.8 } }));
-  await skipDuplicates(() => prisma.driver.create({ data: { name: "محمد علي", phone: "01098765432", phoneNorm: "01098765432", passwordHash: hashSync("Driver@123", 10), isActive: true, isOnline: true, rating: 4.5 } }));
-  console.log("Drivers done");
-
-  // ── Delete old categories & products ──
+  // ── Delete old products & categories ──
   const oldProdCount = await prisma.product.count();
   if (oldProdCount > 0) {
     await prisma.orderItem.deleteMany({});
@@ -95,70 +118,36 @@ async function main() {
     console.log(`Deleted old products (${oldProdCount}) and categories`);
   }
 
-  // ── Categories from real website ──
+  // ── Categories ──
   const catMap: Record<string, string> = {};
   for (const cat of REAL_CATEGORIES) {
     const created = await prisma.category.create({
-      data: {
-        nameAr: cat.nameAr,
-        nameEn: cat.nameEn,
-        slug: cat.slug,
-        icon: cat.icon,
-        sortOrder: cat.sortOrder,
-        descriptionAr: cat.descriptionAr,
-        descriptionEn: cat.descriptionEn,
-        active: true,
-      },
+      data: { nameAr: cat.nameAr, nameEn: cat.nameEn, slug: cat.slug, icon: cat.icon, sortOrder: cat.sortOrder, descriptionAr: cat.descriptionAr, descriptionEn: cat.descriptionEn, active: true },
     });
     catMap[cat.slug] = created.id;
   }
   console.log("Categories created:", Object.keys(catMap).length);
 
-  // ── Products from real website ──
-  let prodIdx = 0;
+  // ── Products ──
+  let idx = 0;
   for (const p of REAL_PRODUCTS) {
-    prodIdx++;
-    const categoryId = catMap[p.categorySlug];
-    if (!categoryId) {
-      console.warn(`  Skip ${p.id} — category ${p.categorySlug} not found`);
-      continue;
-    }
+    idx++;
     await prisma.product.create({
       data: {
-        id: p.id.toUpperCase(),
-        slug: p.id,
-        nameAr: p.nameAr,
-        nameEn: p.nameEn,
-        descriptionAr: p.descriptionAr,
-        descriptionEn: p.descriptionEn,
-        categoryId,
-        price: p.price,
-        active: true,
-        available: true,
-        featured: p.featured,
-        spicy: p.spicy,
-        bestSeller: false,
-        newProduct: false,
-        vegetarian: false,
-        imageId: p.image || null,
+        id: p.id.toUpperCase(), slug: p.id, nameAr: p.ar, nameEn: p.en, descriptionAr: p.desc,
+        categoryId: catMap[p.cat], price: p.price, active: true, available: true,
+        featured: p.feat, spicy: p.spicy, imageId: p.img || null,
         shortDescriptionAr: p.unit,
         shortDescriptionEn: p.unit === "كيلو كامل" ? "Full kg" : p.unit === "صينية" ? "Tray" : p.unit,
-        sortOrder: prodIdx,
-        preparationMinutes: 15,
+        sortOrder: idx, preparationMinutes: 15,
       },
     });
   }
   console.log("Products created:", REAL_PRODUCTS.length);
 
-  // ── Locations ──
-  await skipDuplicates(() => prisma.location.create({ data: { nameAr: "الفرع الرئيسي", nameEn: "Main Branch", addressAr: "شارع التحرير، المعادي، القاهرة", addressEn: "El Tagamoa, Cairo", phone: "01012345678", whatsapp: "201012345678", latitude: 29.9097, longitude: 31.2592, googleMapsUrl: "https://maps.google.com", active: true, deliveryEnabled: true, pickupEnabled: true } }));
-  await skipDuplicates(() => prisma.location.create({ data: { nameAr: "فرع مدينة نصر", nameEn: "Nasr City Branch", addressAr: "شارع مصطفى النحاس، مدينة نصر", addressEn: "Mostafa El Nahas, Nasr City", phone: "01098765432", whatsapp: "201098765432", latitude: 30.0561, longitude: 31.3401, active: true, deliveryEnabled: true, pickupEnabled: false } }));
-  console.log("Locations done");
-
   // ── Delivery zones ──
   await skipDuplicates(() => prisma.deliveryZone.create({ data: { nameAr: "المعادي", nameEn: "Maadi", fee: 25, minimumOrder: 50, etaMinutes: 30, active: true } }));
   await skipDuplicates(() => prisma.deliveryZone.create({ data: { nameAr: "مدينة نصر", nameEn: "Nasr City", fee: 30, minimumOrder: 60, etaMinutes: 35, active: true } }));
-  await skipDuplicates(() => prisma.deliveryZone.create({ data: { nameAr: "مصر الجديدة", nameEn: "Heliopolis", fee: 35, minimumOrder: 70, etaMinutes: 40, active: true } }));
   console.log("Delivery zones done");
 
   // ── Payment methods ──
@@ -166,24 +155,8 @@ async function main() {
   await skipDuplicates(() => prisma.paymentMethod.create({ data: { type: "instapay", labelAr: "انستاباي", labelEn: "InstaPay", active: true, publicVisible: true, deliveryEnabled: true, pickupEnabled: true, sortOrder: 2 } }));
   console.log("Payment methods done");
 
-  // ── Promo codes ──
-  await skipDuplicates(() => prisma.promoCode.create({ data: { code: "JAHZ20", type: "percentage", value: 20, minOrder: 50, maxDiscount: 40, validFrom: new Date(), validUntil: new Date(Date.now() + 60 * 86400000), usageLimit: 50, isActive: true } }));
-  await skipDuplicates(() => prisma.promoCode.create({ data: { code: "FREEDELIVERY", type: "free_delivery", value: 0, minOrder: 100, validFrom: new Date(), validUntil: new Date(Date.now() + 30 * 86400000), usageLimit: 30, isActive: true } }));
-  console.log("Promo codes done");
-
-  // ── Offers ──
-  await skipDuplicates(() => prisma.offer.create({ data: { nameAr: "عرض الافتتاح", nameEn: "Grand Opening", originalPrice: 140, offerPrice: 99, discountPercentage: 29, startDate: new Date(), endDate: new Date(Date.now() + 30 * 86400000), countdownEnabled: true, active: true, featured: true, minimumOrder: 80, usageLimit: 100, perCustomerLimit: 2 } }));
-  console.log("Offers done");
-
-  // ── Site settings ──
-  const settings: Record<string, string> = {
-    phone: "01577793871", email: "info@jahez.com", whatsapp: "+201577793871",
-    address: "المعادي، القاهرة، مصر", siteNameAr: "جاهز", siteNameEn: "Jahez", logo: "/logo.png",
-    heroTitleAr: "أكل بيتي أصيل", heroTitleEn: "Authentic Homemade Food",
-    heroSubtitleAr: "تقدملك أشهي المأكولات العربية", heroSubtitleEn: "Serving you the finest Arabic cuisine",
-    whatsappNumber: "+201577793871", openingHours: "Sat-Thu: 11AM-11PM, Fri: 2PM-12AM",
-  };
-  for (const [key, value] of Object.entries(settings)) {
+  // ── Site settings (synced with website) ──
+  for (const [key, value] of Object.entries(SITE_SETTINGS)) {
     const existing = await prisma.siteSetting.findUnique({ where: { key } });
     if (existing) {
       await prisma.siteSetting.update({ where: { key }, data: { value: JSON.stringify(value) } });
@@ -191,14 +164,13 @@ async function main() {
       await prisma.siteSetting.create({ data: { key, value: JSON.stringify(value) } });
     }
   }
-  console.log("Site settings done");
+  console.log("Site settings done (synced with website)");
 
   // ── Site content ──
   const contentItems = [
-    { section: "about", key: "story", value: "جاهز بدأت من بيت صغير في القاهرة، وكبرت لتصلي لألف بيت. أكلنا أصيل، وطعمه بيت." },
-    { section: "about", key: "mission", value: "نقدم أكل عربي أصيل بجودة عالية وأسعار مناسبة لكل العائلات." },
+    { section: "about", key: "story", value: "جاهز بدأت من بيت صغير في القاهرة، وكبرت لألف بيت. أكلنا أصيل، وطعمه بيت." },
+    { section: "about", key: "mission", value: "نقدم أكل عربي أصيل بجودة عالية وأسعار مناسبة." },
     { section: "footer", key: "tagline", value: "أكل بيتي أصيل — جاهز ليك" },
-    { section: "hero", key: "cta", value: "اطلب دلوقتي" },
   ];
   for (const c of contentItems) {
     const existing = await prisma.siteContent.findUnique({ where: { section_key: { section: c.section, key: c.key } } });
@@ -207,15 +179,9 @@ async function main() {
   console.log("Site content done");
 
   // ── Testimonials ──
-  await skipDuplicates(() => prisma.testimonial.create({ data: { nameAr: "سارة أحمد", textAr: "أحلى منتجات أكل بيتي ذقتها في حياتي! أكيد هطلب تاني.", rating: 5, source: "Google", active: true } }));
-  await skipDuplicates(() => prisma.testimonial.create({ data: { nameAr: "محمد حسن", textAr: "الدجاج المتبل كان روعة والتوصيل كان سريع.", rating: 5, source: "Facebook", active: true } }));
-  await skipDuplicates(() => prisma.testimonial.create({ data: { nameAr: "نورا إبراهيم", nameEn: "Nora Ibrahim", textEn: "Best frozen food in Cairo. Highly recommended!", rating: 4, source: "Google", active: true } }));
+  await skipDuplicates(() => prisma.testimonial.create({ data: { nameAr: "سارة أحمد", textAr: "أحلى منتجات أكل بيتي ذقتها! أكيد هطلب تاني.", rating: 5, source: "Google", active: true } }));
+  await skipDuplicates(() => prisma.testimonial.create({ data: { nameAr: "محمد حسن", textAr: "الدجاج المتبل كان روعة والتوصيل سريع.", rating: 5, source: "Facebook", active: true } }));
   console.log("Testimonials done");
-
-  // ── Sample customers ──
-  await skipDuplicates(() => prisma.customer.create({ data: { name: "سارة أحمد", phone: "01111111111", normalizedPhone: "01111111111", email: "sara@test.com", totalSpent: 450, ordersCount: 5 } }));
-  await skipDuplicates(() => prisma.customer.create({ data: { name: "محمد حسن", phone: "01222222222", normalizedPhone: "01222222222", email: "mohamed@test.com", totalSpent: 280, ordersCount: 3 } }));
-  console.log("Customers done");
 
   console.log("Seed completed!");
 }

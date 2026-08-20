@@ -56,6 +56,59 @@ function Toggle({ label, checked, onChange, disabled }: { label: string; checked
   );
 }
 
+function ImageUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const upload = async (file: File) => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const d = await res.json();
+      if (d.ok) onChange(d.url);
+    } catch {}
+    setUploading(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) upload(file);
+  };
+
+  return (
+    <div
+      className={`relative border-2 border-dashed rounded-xl p-4 text-center transition-colors cursor-pointer ${dragOver ? "border-[#c9a23b] bg-[#c9a23b]/5" : "border-gray-200 hover:border-gray-300"}`}
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={handleDrop}
+      onClick={() => inputRef.current?.click()}
+    >
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) upload(file);
+      }} />
+      {value ? (
+        <div className="relative inline-block">
+          <img src={value} alt="" className="h-20 w-20 object-cover rounded-lg" />
+          <button
+            onClick={(e) => { e.stopPropagation(); onChange(""); }}
+            className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+          >✕</button>
+        </div>
+      ) : (
+        <div>
+          <p className="text-sm" style={{ color: "#6b7280" }}>{uploading ? "جاري الرفع..." : "اسحب الصورة هنا أو اضغط للتحميل"}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ProductsTab() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -146,14 +199,14 @@ export function ProductsTab() {
   const startEdit = (p: Product) => {
     setForm({
       id: p.id, nameAr: p.nameAr || "", nameEn: p.nameEn || "", slug: p.slug || "",
-      price: String(p.price || ""), categoryId: p.categoryId || "", image: p.image || "",
+      price: String(p.price || ""), categoryId: p.categoryId || "", image: p.image || p.imageId || "",
       available: p.available !== false, featured: !!p.featured, spicy: !!p.spicy,
     });
     setShowModal(true);
   };
 
   return (
-    <div dir="rtl" className="space-y-4 p-1">
+    <div dir="rtl" className="space-y-4 p-1" style={{ fontFamily: "Cairo, sans-serif" }}>
       {notice && (
         <div className="rounded-xl border border-gray-100 bg-white px-5 py-3 text-sm font-bold shadow-sm" style={{ color: "#0a2d1d" }}>
           {notice}
@@ -194,10 +247,17 @@ export function ProductsTab() {
           <div
             className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
+            style={{ fontFamily: "Cairo, sans-serif" }}
           >
             <h3 className="mb-4 text-base font-bold" style={{ color: "#0a2d1d" }}>
               {form.id ? `تعديل: ${form.nameAr}` : "إضافة منتج جديد"}
             </h3>
+
+            <div className="mb-4">
+              <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>صورة المنتج</label>
+              <ImageUpload value={form.image} onChange={(url) => setForm({ ...form, image: url })} />
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>الاسم بالعربي *</label>
@@ -215,7 +275,7 @@ export function ProductsTab() {
                 <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>السعر (ج.م) *</label>
                 <input type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#c9a23b]" />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>الفئة *</label>
                 <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#c9a23b]">
                   <option value="">اختر فئة...</option>
@@ -223,10 +283,6 @@ export function ProductsTab() {
                     <option key={c.id} value={c.id}>{c.nameAr || c.nameEn}</option>
                   ))}
                 </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>رابط الصورة</label>
-                <input dir="ltr" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#c9a23b]" />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-4">
