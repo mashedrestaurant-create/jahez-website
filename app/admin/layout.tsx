@@ -41,6 +41,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => { window.location.href = "/admin/login"; });
   }, [isLoginPage]);
 
+  const visibleTabs = TABS.filter((t) => !t.roles || (admin?.role && t.roles.includes(admin.role)));
+
+  const handleTabClick = useCallback((tab: Tab) => {
+    setActiveTab(tab);
+  }, [setActiveTab]);
+
   if (isLoginPage) {
     return <>{children}</>;
   }
@@ -54,12 +60,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   if (!admin || !authed) return null;
-
-  const visibleTabs = TABS.filter((t) => !t.roles || t.roles.includes(admin.role));
-
-  const handleTabClick = useCallback((tab: Tab) => {
-    setActiveTab(tab);
-  }, [setActiveTab]);
 
   return (
     <div className="min-h-screen flex" style={{ background: "#f8f9fa" }}>
