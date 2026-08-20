@@ -369,6 +369,7 @@ export default function CartPage() {
         return;
       }
       trackEvent("order_placed", undefined, { orderId: p.orderId, method: selectedPaymentMethod, total: confirmedTotal });
+      trackEvent("payment_success", undefined, { method: selectedPaymentMethod, total: confirmedTotal, orderId: p.orderId });
       if (settings.whatsappNumber.trim()) {
         window.open(
           `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(orderMessage)}`,

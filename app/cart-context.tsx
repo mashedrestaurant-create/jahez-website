@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { trackAddToCart } from "./event-tracker";
 export type CartItem = {
   key: string;
   id: string;
@@ -102,6 +103,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       notice,
       lastOrder,
       addItem: (item) => {
+        trackAddToCart(item.id, item.name, item.price);
         setItems((current) => {
           const match = current.find(
             (entry) =>

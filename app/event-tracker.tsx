@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 const SESSION_KEY = "jahez-session-id";
 
@@ -30,14 +31,46 @@ export function trackEvent(event: string, page?: string, meta?: Record<string, u
   }
 }
 
+export function trackAddToCart(productId: string, productName: string, price: number) {
+  trackEvent("add_to_cart", undefined, { productId, productName, price });
+}
+
+export function trackCheckoutStart(total: number, items: number) {
+  trackEvent("checkout_start", undefined, { total, items });
+}
+
+export function trackPaymentAttempt(method: string, total: number) {
+  trackEvent("payment_attempt", undefined, { method, total });
+}
+
+export function trackPaymentSuccess(method: string, total: number, orderId?: string) {
+  trackEvent("payment_success", undefined, { method, total, orderId });
+}
+
+export function trackPaymentFailed(method: string, reason?: string) {
+  trackEvent("payment_failed", undefined, { method, reason });
+}
+
+export function trackPaymentCancelled(method: string) {
+  trackEvent("payment_cancelled", undefined, { method });
+}
+
 export function EventTracker() {
+  const pathname = usePathname();
+  const lastPath = useRef<string>("");
   const tracked = useRef(false);
 
   useEffect(() => {
-    if (tracked.current) return;
-    tracked.current = true;
-    trackEvent("pageview");
+    if (!tracked.current) {
+      tracked.current = true;
+      trackEvent("pageview", pathname);
+    } else if (pathname !== lastPath.current) {
+      trackEvent("pageview", pathname);
+    }
+    lastPath.current = pathname;
+  }, [pathname]);
 
+  useEffect(() => {
     const handleBeforeUnload = () => {
       trackEvent("page_exit");
     };

@@ -520,7 +520,23 @@ model Testimonial {
   updatedAt  DateTime @updatedAt
 }
 
-// ─── 28. ActivityLog ─────────────────────────────────
+// ─── 28. SiteEvent ─────────────────────────────────
+model SiteEvent {
+  id        String   @id @default(cuid())
+  sessionId String
+  event     String
+  page      String?
+  meta      Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([event])
+  @@index([createdAt])
+}
+
+// ─── 29. ActivityLog ─────────────────────────────────
 model ActivityLog {
   id       String   @id @default(cuid())
   adminId  String?

@@ -5,6 +5,7 @@ import { useAdminStore, type Tab } from "../lib/admin-store";
 
 const TABS_AR: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
   { id: "overview", label: "نظرة عامة", icon: "📊" },
+  { id: "analytics", label: "التحليلات", icon: "📈" },
   { id: "orders", label: "الطلبات", icon: "📋" },
   { id: "products", label: "المنتجات", icon: "🍽️" },
   { id: "categories", label: "الأقسام", icon: "📂" },
@@ -16,6 +17,7 @@ const TABS_AR: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
 
 const TABS_EN: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
   { id: "overview", label: "Overview", icon: "📊" },
+  { id: "analytics", label: "Analytics", icon: "📈" },
   { id: "orders", label: "Orders", icon: "📋" },
   { id: "products", label: "Products", icon: "🍽️" },
   { id: "categories", label: "Categories", icon: "📂" },

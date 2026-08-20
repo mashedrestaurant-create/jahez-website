@@ -1,6 +1,7 @@
 "use client";
 import { useAdminStore } from "../lib/admin-store";
 import { OverviewTab } from "./tabs/overview";
+import { AnalyticsTab } from "./tabs/analytics";
 import { OrdersTab } from "./tabs/orders";
 import { ProductsTab } from "./tabs/products";
 import { CategoriesTab } from "./tabs/categories";
@@ -11,6 +12,7 @@ import { SettingsTab } from "./tabs/settings";
 
 const TAB_MAP: Record<string, React.FC> = {
   overview: OverviewTab,
+  analytics: AnalyticsTab,
   orders: OrdersTab,
   products: ProductsTab,
   categories: CategoriesTab,
