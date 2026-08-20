@@ -24,18 +24,26 @@ const TABS: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { admin, setAdmin, activeTab, setActiveTab, sidebarOpen, toggleSidebar, logout } = useAdminStore();
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
+  const [authed, setAuthed] = useState(false);
+
+  const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
+    if (isLoginPage) {
+      setLoading(false);
+      return;
+    }
     fetch("/api/admin/auth/me")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => { setAdmin(d.admin); setLoading(false); })
-      .catch(() => { router.push("/admin/login"); });
-  }, []);
+      .then((r) => { if (!r.ok) throw new Error("unauth"); return r.json(); })
+      .then((d) => { setAdmin(d.admin); setAuthed(true); setLoading(false); })
+      .catch(() => { window.location.href = "/admin/login"; });
+  }, [isLoginPage]);
 
-  const handleTabClick = useCallback((tab: Tab) => {
-    setActiveTab(tab);
-  }, [setActiveTab]);
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
@@ -45,9 +53,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!admin) return null;
+  if (!admin || !authed) return null;
 
   const visibleTabs = TABS.filter((t) => !t.roles || t.roles.includes(admin.role));
+
+  const handleTabClick = useCallback((tab: Tab) => {
+    setActiveTab(tab);
+  }, [setActiveTab]);
 
   return (
     <div className="min-h-screen flex" style={{ background: "#f8f9fa" }}>

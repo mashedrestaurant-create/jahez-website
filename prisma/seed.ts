@@ -1,5 +1,7 @@
 import { PrismaClient } from "../app/generated/prisma/client";
 import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import bcryptjs from "bcryptjs";
+const { hashSync } = bcryptjs;
 import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -32,13 +34,13 @@ function skipDuplicates(fn: () => Promise<any>): Promise<any> {
 async function main() {
   console.log("Seeding database...");
 
-  await skipDuplicates(() => prisma.adminUser.create({ data: { username: "owner", name: "المالك", email: "owner@example.com", passwordHash: "Admin@123456", role: "owner", isActive: true } }));
-  await skipDuplicates(() => prisma.adminUser.create({ data: { username: "admin", name: "مدير النظام", email: "admin@example.com", passwordHash: "Admin@123456", role: "admin", isActive: true } }));
-  await skipDuplicates(() => prisma.adminUser.create({ data: { username: "receiver", name: "مستقبل الطلبات", email: "receiver@example.com", passwordHash: "Admin@123456", role: "order_receiver", isActive: true } }));
+  await skipDuplicates(() => prisma.adminUser.create({ data: { username: "owner", name: "المالك", email: "owner@example.com", passwordHash: hashSync("Admin@123456", 10), role: "owner", isActive: true } }));
+  await skipDuplicates(() => prisma.adminUser.create({ data: { username: "admin", name: "مدير النظام", email: "admin@example.com", passwordHash: hashSync("Admin@123456", 10), role: "admin", isActive: true } }));
+  await skipDuplicates(() => prisma.adminUser.create({ data: { username: "receiver", name: "مستقبل الطلبات", email: "receiver@example.com", passwordHash: hashSync("Admin@123456", 10), role: "order_receiver", isActive: true } }));
   console.log("Admin users done");
 
-  await skipDuplicates(() => prisma.driver.create({ data: { name: "أحمد محمد", phone: "01012345678", phoneNorm: "01012345678", passwordHash: "Driver@123", isActive: true, isOnline: false, rating: 4.8 } }));
-  await skipDuplicates(() => prisma.driver.create({ data: { name: "محمد علي", phone: "01098765432", phoneNorm: "01098765432", passwordHash: "Driver@123", isActive: true, isOnline: true, rating: 4.5 } }));
+  await skipDuplicates(() => prisma.driver.create({ data: { name: "أحمد محمد", phone: "01012345678", phoneNorm: "01012345678", passwordHash: hashSync("Driver@123", 10), isActive: true, isOnline: false, rating: 4.8 } }));
+  await skipDuplicates(() => prisma.driver.create({ data: { name: "محمد علي", phone: "01098765432", phoneNorm: "01098765432", passwordHash: hashSync("Driver@123", 10), isActive: true, isOnline: true, rating: 4.5 } }));
   console.log("Drivers done");
 
   const catCount = await prisma.category.count();
