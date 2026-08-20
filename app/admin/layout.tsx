@@ -8,17 +8,10 @@ const TABS: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
   { id: "orders", label: "الطلبات", icon: "📋" },
   { id: "products", label: "المنتجات", icon: "🍽️" },
   { id: "categories", label: "الأقسام", icon: "📂" },
-  { id: "locations", label: "الفروع", icon: "📍" },
   { id: "drivers", label: "الطيارين", icon: "🛵" },
-  { id: "customers", label: "العملاء", icon: "👥" },
-  { id: "offers", label: "العروض", icon: "🏷️" },
+  { id: "locations", label: "الفروع", icon: "📍" },
   { id: "payments", label: "طرق الدفع", icon: "💳" },
-  { id: "media", label: "المكتبة", icon: "🖼️" },
   { id: "settings", label: "الإعدادات", icon: "⚙️" },
-  { id: "content", label: "المحتوى", icon: "📝" },
-  { id: "testimonials", label: "التقييمات", icon: "⭐" },
-  { id: "users", label: "المستخدمين", icon: "🔑", roles: ["owner"] },
-  { id: "activity", label: "سجل الحركات", icon: "📜", roles: ["owner"] },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -77,8 +70,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition mb-0.5 ${activeTab === tab.id ? "text-white font-semibold" : "text-white/60 hover:text-white hover:bg-white/5"}`}
-              style={activeTab === tab.id ? { background: "rgba(255,255,255,0.1)" } : {}}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition mb-0.5 ${activeTab === tab.id ? "text-white font-semibold" : "text-white/80 hover:text-white hover:bg-white/10"}`}
+              style={activeTab === tab.id ? { background: "rgba(255,255,255,0.15)" } : {}}
             >
               <span className="text-base">{tab.icon}</span>
               <span>{tab.label}</span>

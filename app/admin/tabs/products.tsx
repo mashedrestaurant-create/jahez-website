@@ -12,10 +12,7 @@ type Product = {
   imageId?: string;
   available?: boolean;
   featured?: boolean;
-  bestSeller?: boolean;
-  newProduct?: boolean;
   spicy?: boolean;
-  vegetarian?: boolean;
   categoryId?: string;
   category?: { id: string; nameAr?: string; nameEn?: string };
 };
@@ -36,15 +33,12 @@ type FormState = {
   image: string;
   available: boolean;
   featured: boolean;
-  bestSeller: boolean;
-  newProduct: boolean;
   spicy: boolean;
-  vegetarian: boolean;
 };
 
 const EMPTY_FORM: FormState = {
   id: "", nameAr: "", nameEn: "", slug: "", price: "", categoryId: "", image: "",
-  available: true, featured: false, bestSeller: false, newProduct: false, spicy: false, vegetarian: false,
+  available: true, featured: false, spicy: false,
 };
 
 function Toggle({ label, checked, onChange, disabled }: { label: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
@@ -153,8 +147,7 @@ export function ProductsTab() {
     setForm({
       id: p.id, nameAr: p.nameAr || "", nameEn: p.nameEn || "", slug: p.slug || "",
       price: String(p.price || ""), categoryId: p.categoryId || "", image: p.image || "",
-      available: p.available !== false, featured: !!p.featured, bestSeller: !!p.bestSeller,
-      newProduct: !!p.newProduct, spicy: !!p.spicy, vegetarian: !!p.vegetarian,
+      available: p.available !== false, featured: !!p.featured, spicy: !!p.spicy,
     });
     setShowModal(true);
   };
@@ -239,10 +232,7 @@ export function ProductsTab() {
             <div className="mt-4 flex flex-wrap gap-4">
               <Toggle label="متوفر" checked={form.available} onChange={(v) => setForm({ ...form, available: v })} />
               <Toggle label="مميز" checked={form.featured} onChange={(v) => setForm({ ...form, featured: v })} />
-              <Toggle label="باستسيلر" checked={form.bestSeller} onChange={(v) => setForm({ ...form, bestSeller: v })} />
-              <Toggle label="جديد" checked={form.newProduct} onChange={(v) => setForm({ ...form, newProduct: v })} />
               <Toggle label="حار" checked={form.spicy} onChange={(v) => setForm({ ...form, spicy: v })} />
-              <Toggle label="نباتي" checked={form.vegetarian} onChange={(v) => setForm({ ...form, vegetarian: v })} />
             </div>
             <div className="mt-5 flex gap-2">
               <button onClick={handleSave} disabled={saving} className="rounded-xl px-5 py-2 text-sm font-bold text-white transition-colors hover:opacity-90 disabled:opacity-50" style={{ background: "#0a2d1d" }}>
@@ -280,10 +270,7 @@ export function ProductsTab() {
                   <th className="px-4 py-3 text-right font-bold" style={{ color: "#6b7280" }}>الفئة</th>
                   <th className="px-4 py-3 text-center font-bold" style={{ color: "#6b7280" }}>متوفر</th>
                   <th className="px-4 py-3 text-center font-bold" style={{ color: "#6b7280" }}>مميز</th>
-                  <th className="px-4 py-3 text-center font-bold" style={{ color: "#6b7280" }}>باستسيلر</th>
-                  <th className="px-4 py-3 text-center font-bold" style={{ color: "#6b7280" }}>جديد</th>
                   <th className="px-4 py-3 text-center font-bold" style={{ color: "#6b7280" }}>حار</th>
-                  <th className="px-4 py-3 text-center font-bold" style={{ color: "#6b7280" }}>نباتي</th>
                   <th className="px-4 py-3 text-right font-bold" style={{ color: "#6b7280" }}>إجراءات</th>
                 </tr>
               </thead>
@@ -292,8 +279,8 @@ export function ProductsTab() {
                   <tr key={p.id} className="transition-colors hover:bg-gray-50/50">
                     <td className="px-4 py-3">
                       <div className="h-10 w-10 overflow-hidden rounded-lg bg-gray-100">
-                        {p.image ? (
-                          <img src={p.image} alt="" className="h-full w-full object-cover" />
+                        {(p.image || p.imageId) ? (
+                          <img src={p.image || p.imageId || ""} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-xs text-gray-300">—</div>
                         )}
@@ -320,26 +307,8 @@ export function ProductsTab() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => toggleField(p.id, "bestSeller", p.bestSeller === false)}
-                        className={`mx-auto block h-5 w-5 rounded-full transition-colors ${p.bestSeller ? "bg-green-500" : "bg-gray-300"}`}
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => toggleField(p.id, "newProduct", p.newProduct === false)}
-                        className={`mx-auto block h-5 w-5 rounded-full transition-colors ${p.newProduct ? "bg-green-500" : "bg-gray-300"}`}
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
                         onClick={() => toggleField(p.id, "spicy", p.spicy === false)}
                         className={`mx-auto block h-5 w-5 rounded-full transition-colors ${p.spicy ? "bg-green-500" : "bg-gray-300"}`}
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => toggleField(p.id, "vegetarian", p.vegetarian === false)}
-                        className={`mx-auto block h-5 w-5 rounded-full transition-colors ${p.vegetarian ? "bg-green-500" : "bg-gray-300"}`}
                       />
                     </td>
                     <td className="px-4 py-3">
