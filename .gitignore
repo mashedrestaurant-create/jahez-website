@@ -55,3 +55,5 @@ OPENCODE_FIX_PRODUCT_IMAGES.md
 .env*
 
 .vercel
+
+/app/generated/prisma

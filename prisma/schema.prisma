@@ -1,0 +1,534 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── 1. AdminUser ────────────────────────────────────
+model AdminUser {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String?
+  passwordHash  String
+  role          String    @default("order_receiver") // owner | admin | order_receiver
+  name          String?
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      AdminSession[]
+  activityLogs  ActivityLog[]
+  ordersChanged OrderStatusHistory[]
+}
+
+// ─── 2. AdminSession ─────────────────────────────────
+model AdminSession {
+  id        String   @id @default(cuid())
+  adminId   String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+// ─── 3. Customer ─────────────────────────────────────
+model Customer {
+  id               String   @id @default(cuid())
+  name             String
+  phone            String   @unique
+  normalizedPhone  String   @unique
+  email            String?
+  birthday         DateTime?
+  marketingConsent Boolean  @default(false)
+  preferredLang    String   @default("ar")
+  totalSpent       Int      @default(0)
+  ordersCount      Int      @default(0)
+  firstSeen        DateTime @default(now())
+  lastSeen         DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  orders Order[]
+}
+
+// ─── 4. Category ─────────────────────────────────────
+model Category {
+  id           String   @id @default(cuid())
+  nameAr       String
+  nameEn       String
+  slug         String   @unique
+  descriptionAr String?
+  descriptionEn String?
+  imageId      String?
+  icon         String?
+  sortOrder    Int      @default(0)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  products Product[]
+}
+
+// ─── 5. Product ──────────────────────────────────────
+model Product {
+  id                       String   @id // SKU like "FR01"
+  categoryId               String
+  slug                     String   @unique
+  nameAr                   String
+  nameEn                   String
+  descriptionAr            String?
+  descriptionEn            String?
+  shortDescriptionAr       String?
+  shortDescriptionEn       String?
+  price                    Int      // minor units
+  compareAtPrice           Int?
+  taxIncluded              Boolean  @default(true)
+  imageId                  String?
+  active                   Boolean  @default(true)
+  available                Boolean  @default(true)
+  featured                 Boolean  @default(false)
+  bestSeller               Boolean  @default(false)
+  newProduct               Boolean  @default(false)
+  spicy                    Boolean  @default(false)
+  vegetarian               Boolean  @default(false)
+  sortOrder                Int      @default(0)
+  preparationMinutes       Int      @default(15)
+  availabilityScheduleJson Json?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  category     Category          @relation(fields: [categoryId], references: [id])
+  addOns       ProductAddOn[]
+  optionGroups ProductOptionGroup[]
+  orderItems   OrderItem[]
+}
+
+// ─── 6. AddOn ────────────────────────────────────────
+model AddOn {
+  id          String @id @default(cuid())
+  nameAr      String
+  nameEn      String
+  descriptionAr String?
+  descriptionEn String?
+  price       Int    @default(0)
+  active      Boolean @default(true)
+  available   Boolean @default(true)
+  maxQuantity Int    @default(3)
+  required    Boolean @default(false)
+  sortOrder   Int    @default(0)
+
+  products ProductAddOn[]
+}
+
+// ─── 7. ProductAddOn ─────────────────────────────────
+model ProductAddOn {
+  productId String
+  addOnId   String
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addOn   AddOn   @relation(fields: [addOnId], references: [id], onDelete: Cascade)
+
+  @@id([productId, addOnId])
+}
+
+// ─── 8. OptionGroup ──────────────────────────────────
+model OptionGroup {
+  id        String   @id @default(cuid())
+  sku       String   @unique
+  nameAr    String
+  nameEn    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  options   Option[]
+  products  ProductOptionGroup[]
+}
+
+// ─── 9. Option ───────────────────────────────────────
+model Option {
+  id            String @id @default(cuid())
+  optionGroupId String
+  sku           String
+  nameAr        String
+  nameEn        String
+  price         Int    @default(0)
+  sortOrder     Int    @default(0)
+
+  optionGroup OptionGroup @relation(fields: [optionGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([optionGroupId, sku])
+}
+
+// ─── 10. ProductOptionGroup ──────────────────────────
+model ProductOptionGroup {
+  productId     String
+  optionGroupId String
+
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  optionGroup OptionGroup @relation(fields: [optionGroupId], references: [id], onDelete: Cascade)
+
+  @@id([productId, optionGroupId])
+}
+
+// ─── 11. BuilderStep ─────────────────────────────────
+model BuilderStep {
+  id            String @id @default(cuid())
+  stepNumber    Int    @unique
+  nameAr        String
+  nameEn        String
+  descriptionAr String?
+  descriptionEn String?
+  isRequired    Boolean @default(true)
+  minSelect     Int    @default(1)
+  maxSelect     Int    @default(1)
+  sortOrder     Int    @default(0)
+  active        Boolean @default(true)
+
+  options BuilderOption[]
+}
+
+// ─── 12. BuilderOption ───────────────────────────────
+model BuilderOption {
+  id            String @id @default(cuid())
+  stepId        String
+  nameAr        String
+  nameEn        String
+  descriptionAr String?
+  descriptionEn String?
+  price         Int    @default(0)
+  imageId       String?
+  active        Boolean @default(true)
+  sortOrder     Int    @default(0)
+
+  step BuilderStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+}
+
+// ─── 13. Offer ───────────────────────────────────────
+model Offer {
+  id                   String   @id @default(cuid())
+  nameAr               String
+  nameEn               String
+  descriptionAr        String?
+  descriptionEn        String?
+  desktopImageId       String?
+  mobileImageId        String?
+  originalPrice        Int
+  offerPrice           Int
+  discountPercentage   Int?
+  startDate            DateTime
+  endDate              DateTime?
+  countdownEnabled     Boolean  @default(false)
+  active               Boolean  @default(true)
+  featured             Boolean  @default(false)
+  promoCode            String?
+  eligibleProducts     Json?
+  eligibleCategories   Json?
+  minimumOrder         Int      @default(0)
+  usageLimit           Int?
+  perCustomerLimit     Int      @default(1)
+  usedCount            Int      @default(0)
+  sortOrder            Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  promoCodeRel PromoCode? @relation(fields: [promoCode], references: [code])
+}
+
+// ─── 14. PromoCode ───────────────────────────────────
+model PromoCode {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  type         String    @default("percentage") // percentage | fixed | free_delivery
+  value        Int
+  minOrder     Int       @default(0)
+  maxDiscount  Int?
+  validFrom    DateTime
+  validUntil   DateTime?
+  usageLimit   Int?
+  perUserLimit Int       @default(1)
+  usedCount    Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  offers    Offer[]
+  orders    Order[]
+}
+
+// ─── 15. DeliveryZone ────────────────────────────────
+model DeliveryZone {
+  id                     String   @id @default(cuid())
+  nameAr                 String
+  nameEn                 String
+  fee                    Int      @default(0)
+  minimumOrder           Int?
+  freeDeliveryThreshold  Int?
+  active                 Boolean  @default(true)
+  etaMinutes             Int      @default(30)
+  sortOrder              Int      @default(0)
+
+  orders Order[]
+}
+
+// ─── 16. PaymentMethod ───────────────────────────────
+model PaymentMethod {
+  id                     String   @id @default(cuid())
+  type                   String   @unique // cash | instapay | paymob_card
+  labelAr                String
+  labelEn                String
+  instructionsAr         String?
+  instructionsEn         String?
+  active                 Boolean  @default(true)
+  publicVisible          Boolean  @default(true)
+  deliveryEnabled        Boolean  @default(true)
+  pickupEnabled          Boolean  @default(true)
+  configurationComplete  Boolean  @default(false)
+  minValue               Int?
+  maxValue               Int?
+  sortOrder              Int      @default(0)
+  restrictions           Json?
+  updatedAt              DateTime @updatedAt
+
+  orders        Order[]
+  paymentAttempts PaymentAttempt[]
+}
+
+// ─── 17. Location ────────────────────────────────────
+model Location {
+  id                String   @id @default(cuid())
+  nameAr            String
+  nameEn            String
+  addressAr         String
+  addressEn         String
+  phone             String?
+  whatsapp          String?
+  latitude          Float?
+  longitude         Float?
+  googleMapsUrl     String?
+  googleMapsEmbed   String?
+  openingHoursJson  Json?
+  deliveryEnabled   Boolean  @default(true)
+  pickupEnabled     Boolean  @default(true)
+  imageId           String?
+  active            Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  orders Order[]
+}
+
+// ─── 18. Order ───────────────────────────────────────
+model Order {
+  id                String   @id @default(cuid())
+  orderNumber       Int      @unique @default(autoincrement())
+  customerId        String?
+  customerName      String
+  customerPhone     String
+  customerPhoneNorm String
+  customerEmail     String?
+  customerBirthday  DateTime?
+  customerLang      String   @default("ar")
+  type              String   @default("delivery") // delivery | pickup
+  status            String   @default("new") // new | confirmed | preparing | ready | out_for_delivery | completed | cancelled
+  branchId          String?
+  deliveryZoneId    String?
+  driverId          String?
+  driverAssignedAt  DateTime?
+  address           String?
+  building          String?
+  floor             String?
+  apartment         String?
+  landmark          String?
+  latitude          Float?
+  longitude         Float?
+  notes             String?
+  marketingConsent  Boolean  @default(false)
+  subtotal          Int      @default(0)
+  deliveryFee       Int      @default(0)
+  discount          Int      @default(0)
+  total             Int      @default(0)
+  paymentMethodId   String?
+  paymentMethodType String   @default("cash")
+  paymentRef        String?
+  paymentStatus     String   @default("pending") // pending | paid | failed | refunded
+  promoCodeId       String?
+  discountAmount    Int      @default(0)
+  cancelReason      String?
+  rating            Int?
+  ratingComment     String?
+  ratedAt           DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  deliveryZone   DeliveryZone?   @relation(fields: [deliveryZoneId], references: [id])
+  driver         Driver?         @relation(fields: [driverId], references: [id])
+  branch         Location?       @relation(fields: [branchId], references: [id])
+  paymentMethod  PaymentMethod?  @relation(fields: [paymentMethodId], references: [id])
+  promoCodeRel   PromoCode?      @relation(fields: [promoCodeId], references: [code])
+
+  items           OrderItem[]
+  statusHistory   OrderStatusHistory[]
+  paymentAttempts PaymentAttempt[]
+}
+
+// ─── 19. OrderItem ───────────────────────────────────
+model OrderItem {
+  id                 String  @id @default(cuid())
+  orderId            String
+  productId          String?
+  productNameAr      String?
+  productNameEn      String?
+  quantity           Int     @default(1)
+  unitPrice          Int     @default(0)
+  totalPrice         Int     @default(0)
+  addOnsJson         Json?
+  notes              String?
+  isBuilder          Boolean @default(false)
+  builderConfigJson  Json?
+
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product?  @relation(fields: [productId], references: [id])
+}
+
+// ─── 20. OrderStatusHistory ──────────────────────────
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  status    String
+  note      String?
+  changedBy String?
+  createdAt DateTime @default(now())
+
+  order   Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  admin   AdminUser? @relation(fields: [changedBy], references: [id])
+}
+
+// ─── 21. PaymentAttempt ──────────────────────────────
+model PaymentAttempt {
+  id               String   @id @default(cuid())
+  orderId          String
+  paymentMethodId  String?
+  provider         String?
+  providerOrderId  String?
+  transactionId    String?
+  amount           Int
+  status           String   @default("pending")
+  gatewayResponse  Json?
+  hmacVerified     Boolean  @default(false)
+  requestId        String?
+  createdAt        DateTime @default(now())
+
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+}
+
+// ─── 22. Driver ──────────────────────────────────────
+model Driver {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String
+  phoneNorm    String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  isOnline     Boolean  @default(false)
+  lastLat      Float?
+  lastLng      Float?
+  lastSeenAt   DateTime?
+  rating       Float    @default(5)
+  trips        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions  DriverSession[]
+  orders    Order[]
+}
+
+// ─── 23. DriverSession ───────────────────────────────
+model DriverSession {
+  id        String   @id @default(cuid())
+  driverId  String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+// ─── 24. MediaAsset ──────────────────────────────────
+model MediaAsset {
+  id           String   @id @default(cuid())
+  blobUrl      String
+  pathname     String?
+  originalName String
+  mimeType     String
+  width        Int?
+  height       Int?
+  sizeBytes    Int
+  altAr        String?
+  altEn        String?
+  captionAr    String?
+  captionEn    String?
+  focalX       Float    @default(0.5)
+  focalY       Float    @default(0.5)
+  status       String   @default("active") // active | archived
+  tagsJson     Json?
+  createdBy    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─── 25. SiteSetting ─────────────────────────────────
+model SiteSetting {
+  key   String @id
+  value Json
+}
+
+// ─── 26. SiteContent ─────────────────────────────────
+model SiteContent {
+  id        String @id @default(cuid())
+  section   String
+  key       String
+  value     String
+  sortOrder Int    @default(0)
+  active    Boolean @default(true)
+
+  @@unique([section, key])
+}
+
+// ─── 27. Testimonial ─────────────────────────────────
+model Testimonial {
+  id         String   @id @default(cuid())
+  nameAr     String?
+  nameEn     String?
+  rating     Int      @default(5)
+  textAr     String?
+  textEn     String?
+  avatarUrl  String?
+  source     String?
+  sourceUrl  String?
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── 28. ActivityLog ─────────────────────────────────
+model ActivityLog {
+  id       String   @id @default(cuid())
+  adminId  String?
+  action   String
+  entity   String?
+  entityId String?
+  details  Json?
+  ip       String?
+  createdAt DateTime @default(now())
+
+  admin AdminUser? @relation(fields: [adminId], references: [id])
+}
