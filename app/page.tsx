@@ -158,7 +158,7 @@ export default function HomePage() {
                     sizes="(max-width: 700px) 90vw, 30vw"
                     fallbackSrc={productFallbacks[product.category]}
                   />
-                  <span className="card-index">0{index + 1}</span>
+                  
                 </div>
                 <div className="featured-body">
                   <span className="product-en">
