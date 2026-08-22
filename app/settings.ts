@@ -77,7 +77,7 @@ export const defaultSettings: SiteSettings = {
   primaryColor: "#0A2D1D",
   accentColor: "#C9A23B",
   creamColor: "#F7F0DF",
-  whatsappNumber: "",
+  whatsappNumber: "+201577793871",
   mapsUrl: "https://maps.app.goo.gl/PiqQRLCs3oQ9m7178",
   pickupAddressAr: "نقطة استلام جاهز — التجمع، افتحي الخريطة للوصول للموقع",
   pickupAddressEn: "Jahez pickup point — New Cairo. Open the map for directions",
