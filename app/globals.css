@@ -3249,33 +3249,6 @@ img {
   line-height: 1;
 }
 
-.floating-whatsapp {
-  position: fixed;
-  z-index: 90;
-  right: 24px;
-  bottom: max(24px, env(safe-area-inset-bottom, 24px));
-  min-width: 184px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 16px;
-  color: #fff;
-  background: #1faa59;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  box-shadow: 0 15px 35px rgba(20, 92, 51, 0.28);
-}
-
-.floating-whatsapp span {
-  font-size: 10px;
-  font-weight: 900;
-}
-
-.floating-whatsapp b {
-  font-size: 10px;
-  direction: ltr;
-}
 
 /* ─── Floating vertical social bar (like WhatsApp float) ─── */
 .floating-social {
@@ -3321,6 +3294,10 @@ img {
 
 .floating-social-item.tiktok {
   background: #161616;
+}
+
+.floating-social-item.whatsapp {
+  background: #25d366;
 }
 
 .menu-item {
@@ -4945,17 +4922,6 @@ img {
     height: 36px;
     padding-inline: 8px;
     font-size: 8px;
-  }
-
-  .floating-whatsapp {
-    right: 14px;
-    bottom: max(20px, env(safe-area-inset-bottom, 20px));
-    min-width: 0;
-    padding: 12px 15px;
-  }
-
-  .floating-whatsapp b {
-    display: none;
   }
 
   .floating-social {
