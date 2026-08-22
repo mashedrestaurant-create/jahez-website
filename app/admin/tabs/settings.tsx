@@ -103,10 +103,18 @@ export function SettingsTab() {
       </Section>
 
       <Section title="التوصيل">
-        <Field label="رسوم التوصيل" keyName="deliveryFee" type="number" />
+        <Field label="رسوم التوصيل الثابتة (للاحتياط)" keyName="deliveryFee" type="number" />
         <Field label="الحد الأدنى للطلب" keyName="minimumOrder" type="number" />
         <Field label="توصيل مجاني فوق" keyName="freeDeliveryThreshold" type="number" />
         <Field label="مدة الطلب (ساعات)" keyName="orderLeadHours" type="number" />
+      </Section>
+
+      <Section title="موقع الفرع — حساب التوصيل بالمسافة">
+        <p style={{ gridColumn: "1 / -1", fontSize: 12, color: "#6b7280", margin: 0 }}>
+          العميل هيختار موقعه على الخريطة والنظام يحسب تلقائي: أول 5 كم = 35 ج.م، وكل كيلو زيادة = 10 ج.م. حطي إحداثيات الفرع بالظبط (من Google Maps: كليك يمين على الموقع → انسخي الأرقام).
+        </p>
+        <Field label="خط العرض Latitude (مثال: 29.9602)" keyName="storeLat" />
+        <Field label="خط الطول Longitude (مثال: 31.2569)" keyName="storeLng" />
       </Section>
 
       <Section title="الدفع">

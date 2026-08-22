@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { orders } from "@/db/schema";
+import { prisma } from "../../../../lib/prisma";
 import {
   getPaymobConfig,
   queryToPaymobObject,
@@ -40,23 +38,17 @@ async function applyCallback(object: CallbackObject, hmac: string) {
     return { ok: false as const, status: 400, localOrderId: null };
   }
 
-  const db = getDb();
-  const [existingOrder] = await db
-    .select({
-      id: orders.id,
-      total: orders.total,
-      paymentStatus: orders.paymentStatus,
-    })
-    .from(orders)
-    .where(eq(orders.providerOrderId, paymobOrderId))
-    .limit(1);
+  const existingOrder = await prisma.order.findFirst({
+    where: { paymentRef: paymobOrderId },
+    select: { id: true, orderNumber: true, total: true, paymentStatus: true },
+  });
 
   if (!existingOrder) {
     return { ok: false as const, status: 404, localOrderId: null };
   }
 
   if (existingOrder.paymentStatus === "paid") {
-    return { ok: true as const, status: 200, paid: true, localOrderId: existingOrder.id, idempotent: true };
+    return { ok: true as const, status: 200, paid: true, localOrderId: existingOrder.orderNumber, idempotent: true };
   }
 
   const paid =
@@ -66,10 +58,10 @@ async function applyCallback(object: CallbackObject, hmac: string) {
 
   if (paid) {
     const callbackAmountCents = Number(object.amount_cents || 0);
-    const expectedAmountCents = Math.round(existingOrder.total * 100);
-    if (callbackAmountCents > 0 && callbackAmountCents !== expectedAmountCents) {
+    // Prisma stores money in piasters already
+    if (callbackAmountCents > 0 && callbackAmountCents !== existingOrder.total) {
       console.error(
-        `Paymob amount mismatch for order ${existingOrder.id}: expected ${expectedAmountCents}, got ${callbackAmountCents}`,
+        `Paymob amount mismatch for order ${existingOrder.orderNumber}: expected ${existingOrder.total}, got ${callbackAmountCents}`,
       );
       return { ok: false as const, status: 400, localOrderId: null };
     }
@@ -77,35 +69,33 @@ async function applyCallback(object: CallbackObject, hmac: string) {
 
   const paymentFailed = !paid && isTrue(object.error_occured);
   const paymentStatus = paid ? "paid" : paymentFailed ? "payment_failed" : "payment_cancelled";
-  const orderStatus = paid ? "confirmed" : undefined;
+  const newStatus = paid ? "confirmed" : undefined;
 
-  const updateData: {
-    paymentStatus: string;
-    providerTransactionId: string;
-    updatedAt: Date;
-    orderStatus?: string;
-  } = {
-    paymentStatus,
-    providerTransactionId:
-      object.id === undefined || object.id === null ? "" : String(object.id),
-    updatedAt: new Date(),
-  };
-  if (orderStatus) {
-    updateData.orderStatus = orderStatus;
+  await prisma.order.update({
+    where: { id: existingOrder.id },
+    data: {
+      paymentStatus,
+      ...(newStatus ? { status: newStatus } : {}),
+    },
+  });
+
+  // Separate statement — Neon HTTP adapter has no nested-write transactions
+  if (newStatus || !paid) {
+    await prisma.orderStatusHistory.create({
+      data: {
+        orderId: existingOrder.id,
+        status: newStatus || existingOrder.paymentStatus,
+        note: paid ? "Payment confirmed via Paymob" : `Payment ${paymentStatus} via Paymob`,
+      },
+    }).catch(() => {});
   }
-
-  const [updated] = await db
-    .update(orders)
-    .set(updateData)
-    .where(eq(orders.providerOrderId, paymobOrderId))
-    .returning({ id: orders.id });
 
   return {
     ok: true as const,
     status: 200,
     paid,
     cancelled: !paid && !paymentFailed,
-    localOrderId: updated?.id ?? existingOrder.id,
+    localOrderId: existingOrder.orderNumber,
   };
 }
 

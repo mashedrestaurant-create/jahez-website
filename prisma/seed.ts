@@ -34,7 +34,6 @@ function skipDuplicates(fn: () => Promise<any>): Promise<any> {
 const CATEGORIES = [
   { slug: "poultry", nameAr: "دواجن", nameEn: "Poultry", icon: "🐔", sortOrder: 1, descAr: "البيع بالكيلو الكامل — مجهز ومتبل وجاهز للتسوية", descEn: "Sold by the full kilogram — prepared, seasoned and ready to cook", image: "/assets/jahez/poultry.jpg" },
   { slug: "beef", nameAr: "لحوم", nameEn: "Beef", icon: "🥩", sortOrder: 2, descAr: "البيع بالكيلو الكامل — تجهيز يومي حسب الطلب", descEn: "Sold by the full kilogram — prepared fresh for each order", image: "/assets/jahez/beef.jpg" },
-  { slug: "cooked-meals", nameAr: "وجبات مطهية", nameEn: "Cooked Meals", icon: "🍳", sortOrder: 3, descAr: "جاهزة للتسخين والتقديم", descEn: "Ready to heat and serve", image: "/assets/jahez/ready-meals.jpg" },
   { slug: "ready-meals", nameAr: "وجبات جاهزة", nameEn: "Ready Meals", icon: "📦", sortOrder: 4, descAr: "اختاري الصنف بالحجم ووحدة البيع الموضحة", descEn: "Order using the listed tray or kilogram unit", image: "/assets/jahez/ready-meals.jpg" },
   { slug: "appetizers", nameAr: "مقبلات", nameEn: "Appetizers", icon: "🥟", sortOrder: 5, descAr: "العبوة تحتوي على 15 قطعة", descEn: "Each pack contains 15 pieces", image: "/assets/jahez/appetizers.jpg" },
 ];
@@ -56,7 +55,7 @@ const PRODUCTS = [
   { id: "beef-teriyaki", cat: "beef", ar: "بيف ترياكي", en: "Beef Teriyaki", desc: "شرائح لحم بتتبيلة ترياكي.", unit: "كيلو كامل", price: 750, feat: false, spicy: false, img: "" },
   { id: "spicy-cajun-beef", cat: "beef", ar: "بيف كاجن حار", en: "Spicy Cajun Beef", desc: "شرائح لحم بالكاجن الحار.", unit: "كيلو كامل", price: 750, feat: false, spicy: true, img: "" },
   { id: "sweet-chili-beef", cat: "beef", ar: "بيف سويت تشيلي", en: "Sweet Chili Beef", desc: "شرائح لحم بسويت تشيلي.", unit: "كيلو كامل", price: 750, feat: false, spicy: false, img: "" },
-  { id: "beef-bolognese", cat: "cooked-meals", ar: "صوص بولونيز باللحم", en: "Beef Bolognese Sauce", desc: "صوص بولونيز مطهي.", unit: "كيلو كامل", price: 550, feat: true, spicy: false, img: "" },
+  { id: "beef-bolognese", cat: "beef", ar: "صوص بولونيز باللحم", en: "Beef Bolognese Sauce", desc: "صوص بولونيز مطهي.", unit: "كيلو كامل", price: 550, feat: true, spicy: false, img: "" },
   { id: "stuffed-vine-leaves", cat: "ready-meals", ar: "ورق عنب محشي", en: "Stuffed Vine Leaves", desc: "ورق عنب محشي.", unit: "كيلو كامل", price: 260, feat: true, spicy: false, img: "/assets/jahez/ready-meals.jpg" },
   { id: "beef-goulash", cat: "ready-meals", ar: "جلاش باللحم", en: "Beef Goulash", desc: "جلاش محشي باللحم.", unit: "صينية", price: 470, feat: false, spicy: false, img: "" },
   { id: "lasagna", cat: "ready-meals", ar: "لازانيا", en: "Lasagna", desc: "لازانيا مجهزة.", unit: "صينية", price: 600, feat: false, spicy: false, img: "" },

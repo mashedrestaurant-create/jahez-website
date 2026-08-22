@@ -34,7 +34,7 @@ function Header() {
           >
             <Image
               src="/assets/jahez/logo.jpg"
-              alt="جاهز Jahez"
+              alt="چاهِز Jahez"
               width={130}
               height={130}
               priority
@@ -106,7 +106,7 @@ function Footer() {
         <div className="footer-brand-col">
           <Image
             src="/assets/jahez/logo.jpg"
-            alt="جاهز Jahez"
+            alt="چاهِز Jahez"
             width={120}
             height={120}
             className="footer-logo-jahez"
@@ -138,12 +138,12 @@ function Footer() {
         </div>
       </div>
       <div className="footer-bottom container">
-        <span>{isArabic ? `جاهز © ${year} — جميع الحقوق محفوظة` : `© ${year} JAHEZ — All rights reserved`}</span>
+        <span>{isArabic ? `چاهِز © ${year} — جميع الحقوق محفوظة` : `© ${year} JAHEZ — All rights reserved`}</span>
       </div>
       {whatsappNumber && (
         <a
           className="floating-whatsapp"
-          href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(isArabic ? "أهلاً جاهز، عايزة أستفسر عن طلب" : "Hello Jahez, I would like to ask about an order")}`}
+          href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(isArabic ? "أهلاً چاهِز، عايزة أستفسر عن طلب" : "Hello Jahez, I would like to ask about an order")}`}
           target="_blank"
           rel="noreferrer"
           aria-label={t("orderWhatsapp")}

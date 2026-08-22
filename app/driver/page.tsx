@@ -35,7 +35,7 @@ export default function DriverPage() {
   };
 
   const statusLabel = (s: string) => {
-    const map: Record<string, string> = { confirmed: "مؤكد", preparing: "قيد التحضير", ready: "جاهز", out_for_delivery: "قيد التوصيل", delivered: "تم التوصيل", cancelled: "ملغي" };
+    const map: Record<string, string> = { confirmed: "مؤكد", preparing: "قيد التحضير", ready: "چاهِز", out_for_delivery: "قيد التوصيل", delivered: "تم التوصيل", cancelled: "ملغي" };
     return map[s] || s;
   };
 
@@ -53,7 +53,7 @@ export default function DriverPage() {
       <div className="text-white p-4 shadow-md" style={{ background: "#0a2d1d" }}>
         <div className="flex justify-between items-center max-w-lg mx-auto">
           <div>
-            <h1 className="text-lg font-bold">جاهز — الطيار</h1>
+            <h1 className="text-lg font-bold">چاهِز — الطيار</h1>
             <p className="text-xs text-white/60">{driver.name} · {driver.phone}</p>
           </div>
           <div className="flex items-center gap-2">

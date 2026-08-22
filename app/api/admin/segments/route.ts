@@ -1,69 +1,31 @@
-import { sql, gte, eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { customers } from "@/db/schema";
+import { NextRequest } from "next/server";
+import { prisma } from "../../../lib/prisma";
+import { json, authenticate } from "../../../lib/crud";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await authenticate(request, "customers:read");
+  if (auth.response) return auth.response;
+
   try {
-    const db = getDb();
-
-    const allCustomers = await db
-      .select({
-        id: customers.id,
-        name: customers.name,
-        phone: customers.phone,
-        email: customers.email,
-        birthday: customers.birthday,
-        area: customers.area,
-        ordersCount: customers.ordersCount,
-        totalSpent: customers.totalSpent,
-        lastSeenAt: customers.lastSeenAt,
-      })
-      .from(customers)
-      .orderBy(sql`${customers.lastSeenAt} desc`)
-      .limit(250);
-
-    const now = new Date();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
-    const nextMm = String(((now.getMonth() + 1) % 12) + 1).padStart(2, "0");
-    const nextMonthLastDay = new Date(now.getFullYear(), (now.getMonth() + 1) % 12 + 1, 0).getDate();
-    const nextDd = String(nextMonthLastDay).padStart(2, "0");
-
-    const upcomingBirthdays = allCustomers.filter((c) => {
-      if (!c.birthday || c.birthday.length < 10) return false;
-      const bdayMMDD = c.birthday.slice(5, 10);
-      return bdayMMDD >= `${mm}-${dd}` && bdayMMDD <= `${nextMm}-${nextDd}`;
+    const now = Date.now();
+    const [total, new30, vip, dormant] = await Promise.all([
+      prisma.customer.count(),
+      prisma.customer.count({ where: { firstSeen: { gte: new Date(now - 30 * 864e5) } } }),
+      prisma.customer.count({ where: { totalSpent: { gte: 500000 } } }),
+      prisma.customer.count({ where: { lastSeen: { lt: new Date(now - 90 * 864e5) } } }),
+    ]);
+    return json({
+      ok: true,
+      segments: [
+        { id: "all", nameAr: "كل العملاء", nameEn: "All customers", count: total },
+        { id: "new30", nameAr: "جديد آخر 30 يوم", nameEn: "New (30d)", count: new30 },
+        { id: "vip", nameAr: "عملاء VIP (5000ج+)", nameEn: "VIP (5000+ EGP)", count: vip },
+        { id: "dormant", nameAr: "خامل +90 يوم", nameEn: "Dormant (90d+)", count: dormant },
+      ],
     });
-
-    const firstTimers = allCustomers.filter((c) => c.ordersCount === 1);
-    const repeatCustomers = allCustomers.filter((c) => c.ordersCount >= 2);
-    const vipCustomers = allCustomers.filter((c) => c.totalSpent >= 500);
-
-    const counts = {
-      total: allCustomers.length,
-      withBirthday: allCustomers.filter((c) => c.birthday && c.birthday.length > 0).length,
-      firstTimers: firstTimers.length,
-      repeat: repeatCustomers.length,
-      vip: vipCustomers.length,
-    };
-
-    return Response.json({
-      counts,
-      segments: {
-        upcomingBirthdays: upcomingBirthdays.slice(0, 100),
-        firstTimers: firstTimers.slice(0, 100),
-        repeatCustomers: repeatCustomers.slice(0, 100),
-        vipCustomers: vipCustomers.slice(0, 100),
-      },
-    });
-  } catch (error) {
-    console.error("segments error", error);
-    return Response.json(
-      { counts: { total: 0, withBirthday: 0, firstTimers: 0, repeat: 0, vip: 0 }, segments: { upcomingBirthdays: [], firstTimers: [], repeatCustomers: [], vipCustomers: [] } },
-      { status: 200 },
-    );
+  } catch {
+    return json({ error: "Failed to load segments" }, 500);
   }
 }

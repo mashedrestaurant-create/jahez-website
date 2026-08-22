@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         <div className="p-5 border-b border-white/10">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-bold" style={{ color: "#ffffff" }}>{lang === "ar" ? "جاهز — لوحة التحكم" : "Jahez — Admin"}</h1>
+            <h1 className="text-lg font-bold" style={{ color: "#ffffff" }}>{lang === "ar" ? "چاهِز — لوحة التحكم" : "Jahez — Admin"}</h1>
             <button
               onClick={() => setLang(lang === "ar" ? "en" : "ar")}
               className="text-xs px-2 py-1 rounded-lg font-bold transition-colors"

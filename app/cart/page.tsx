@@ -10,7 +10,11 @@ import { formatWhatsAppOrder } from "../whatsapp-message";
 import { normalizeEgyptianMobile } from "../egypt-phone";
 import { trackEvent } from "../event-tracker";
 import { useLanguage } from "../language-context";
-import { activeDeliveryZones } from "../delivery-zones";
+import { LocationPicker } from "./location-picker";
+import {
+  getStoreLocation,
+  quoteDelivery,
+} from "../delivery-distance";
 
 function toLocalDateTimeInput(date: Date) {
   const offset = date.getTimezoneOffset() * 60_000;
@@ -28,7 +32,7 @@ export default function CartPage() {
     email: "",
     birthday: "",
     area: "",
-    deliveryZoneId: "",
+    location: null as { lat: number; lng: number } | null,
     address: "",
     notes: "",
     fulfillment: "delivery",
@@ -46,26 +50,23 @@ export default function CartPage() {
     paymentLink: string;
     message: string;
   } | null>(null);
-  const deliveryZones = activeDeliveryZones(settings);
-  const selectedZone =
-    deliveryZones.find((zone) => zone.id === form.deliveryZoneId) || null;
-  const configuredDeliveryFee =
-    selectedZone?.fee ?? Math.max(0, Number(settings.deliveryFee) || 0);
-  const freeDeliveryThreshold =
-    selectedZone?.freeDeliveryThreshold ??
-    Math.max(0, Number(settings.freeDeliveryThreshold) || 0);
+  const store = getStoreLocation(settings);
+  const deliveryQuote =
+    form.fulfillment === "delivery" && form.location
+      ? quoteDelivery(settings, form.location.lat, form.location.lng)
+      : null;
+  const locationValid = deliveryQuote?.ok === true;
+  const freeDeliveryThreshold = Math.max(0, Number(settings.freeDeliveryThreshold) || 0);
+  const baseFee = deliveryQuote?.fee ?? 0;
   const deliveryFee =
-    form.fulfillment === "delivery" &&
-    (deliveryZones.length === 0 || selectedZone) &&
+    form.fulfillment === "delivery" && locationValid &&
     !(freeDeliveryThreshold > 0 && subtotal >= freeDeliveryThreshold)
-      ? configuredDeliveryFee
+      ? baseFee
       : 0;
   const estimatedTotal = subtotal + deliveryFee;
   const discountAmount = 0;
   const totalWithDiscount = Math.max(0, estimatedTotal - discountAmount);
-  const minimumOrder =
-    selectedZone?.minimumOrder ??
-    Math.max(0, Number(settings.minimumOrder) || 0);
+  const minimumOrder = Math.max(0, Number(settings.minimumOrder) || 0);
   const cashEnabled = settings.cashOnDeliveryEnabled === "true";
   const instapayEnabled =
     settings.instapayEnabled === "true" && Boolean(settings.instapayAccount);
@@ -112,11 +113,7 @@ export default function CartPage() {
       customerEmail: form.email || undefined,
       address: form.fulfillment === "delivery" ? form.address : undefined,
       notes: `${isArabic ? "موعد الطلب" : "Requested time"}: ${form.requestedFor}${form.notes ? `\n${form.notes}` : ""}`,
-      deliveryZoneName: selectedZone
-        ? isArabic
-          ? selectedZone.nameAr
-          : selectedZone.nameEn
-        : undefined,
+      deliveryZoneName: undefined,
       promoCode: undefined,
       discountAmount,
       language,
@@ -185,15 +182,20 @@ export default function CartPage() {
       submissionRef.current = false;
       return;
     }
-    if (
-      form.fulfillment === "delivery" &&
-      deliveryZones.length > 0 &&
-      !selectedZone
-    ) {
+    if (form.fulfillment === "delivery" && !form.location) {
       setError(
         isArabic
-          ? "اختار زون التوصيل علشان نحسب الرسوم بدقة"
-          : "Select your delivery zone so we can calculate the correct fee.",
+          ? "اختاري موقعك على الخريطة علشان نحسب رسوم التوصيل"
+          : "Pick your location on the map so we can calculate delivery.",
+      );
+      submissionRef.current = false;
+      return;
+    }
+    if (form.fulfillment === "delivery" && form.location && !locationValid) {
+      setError(
+        isArabic
+          ? deliveryQuote?.reasonAr || "المنطقة دي بره نطاق التوصيل"
+          : deliveryQuote?.reason || "This location is outside our delivery range.",
       );
       submissionRef.current = false;
       return;
@@ -235,7 +237,7 @@ export default function CartPage() {
             quantity: item.quantity,
           })),
           fulfillment: form.fulfillment,
-          deliveryZoneId: form.deliveryZoneId,
+          location: form.location || undefined,
           paymentMethod: selectedPaymentMethod,
           address: form.address,
           notes: form.notes,
@@ -585,7 +587,7 @@ export default function CartPage() {
                   <span className="kicker">INSTAPAY</span>
                   <h2>
                     {isArabic
-                      ? `طلبك #${instapayConfirmation.orderId} جاهز`
+                      ? `طلبك #${instapayConfirmation.orderId} چاهِز`
                       : `Order #${instapayConfirmation.orderId} is ready`}
                   </h2>
                   <p>
@@ -856,61 +858,29 @@ export default function CartPage() {
                     )}
                   </div>
                 )}
-                {form.fulfillment === "delivery" &&
-                  deliveryZones.length > 0 && (
-                    <label>
-                      <span>
-                        {isArabic ? "زون التوصيل" : "Delivery zone"} <span className="required-star">*</span>
-                      </span>
-                      <select
-                        required
-                        value={form.deliveryZoneId}
-                        onChange={(event) => {
-                          const zone = deliveryZones.find(
-                            (item) => item.id === event.target.value,
-                          );
-                          setForm((current) => ({
-                            ...current,
-                            deliveryZoneId: event.target.value,
-                            area: zone
-                              ? isArabic
-                                ? zone.nameAr
-                                : zone.nameEn
-                              : "",
-                          }));
-                        }}
-                      >
-                        <option value="">
-                          {isArabic ? "اختار منطقتك" : "Select your area"}
-                        </option>
-                        {deliveryZones.map((zone) => (
-                          <option value={zone.id} key={zone.id}>
-                            {isArabic ? zone.nameAr : zone.nameEn} —{" "}
-                            {formatPrice(zone.fee)}
-                          </option>
-                        ))}
-                      </select>
-                      {selectedZone && (
-                        <small className="zone-checkout-details">
-                          {isArabic
-                            ? selectedZone.areasAr
-                            : selectedZone.areasEn}
-                          {selectedZone.etaMinutes > 0
-                            ? ` · ${
-                                isArabic ? "الوصول خلال" : "Delivery in"
-                              } ${selectedZone.etaMinutes} ${
-                                isArabic ? "دقيقة تقريبًا" : "min approx."
-                              }`
-                            : ""}
-                        </small>
-                      )}
-                    </label>
-                  )}
-                {form.fulfillment === "delivery" && deliveryZones.length > 0 && (
+                {form.fulfillment === "delivery" && (
+                  <LocationPicker
+                    value={form.location}
+                    onChange={(loc) =>
+                      setForm((current) => ({ ...current, location: loc }))
+                    }
+                    storeLat={store.lat}
+                    storeLng={store.lng}
+                    isArabic={isArabic}
+                  />
+                )}
+                {form.fulfillment === "delivery" && form.location && locationValid && (
+                  <p className="delivery-price-note" style={{ fontWeight: 700 }}>
+                    {isArabic
+                      ? `المسافة من الفرع: ${deliveryQuote!.distanceKm} كم — رسوم التوصيل ${formatPrice(deliveryFee)}`
+                      : `Distance from store: ${deliveryQuote!.distanceKm} km — delivery fee ${formatPrice(deliveryFee)}`}
+                  </p>
+                )}
+                {form.fulfillment === "delivery" && !form.location && (
                   <p className="delivery-price-note">
                     {isArabic
-                      ? "رسوم التوصيل بيتحدد بعد ما تبعتي اللوكيشن بالظبط"
-                      : "Delivery fee will be confirmed after you share your exact location."}
+                      ? "التوصيل: أول 5 كم بـ 35 ج.م، وكل كيلو زيادة بـ 10 ج.م — حددي موقعك على الخريطة للحساب بالظبط"
+                      : "Delivery: first 5 km = EGP 35, each extra km = EGP 10 — pick your map location for the exact price."}
                   </p>
                 )}
                 {form.fulfillment === "delivery" && (
@@ -968,7 +938,7 @@ export default function CartPage() {
                   />
                   <span>
                     {isArabic
-                      ? "موافق استقبل عروض وأخبار جاهز (اختياري)"
+                      ? "موافق استقبل عروض وأخبار چاهِز (اختياري)"
                       : "I agree to receive Jahez offers and news (optional)"}
                   </span>
                 </label>

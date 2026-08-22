@@ -53,7 +53,7 @@ export default function MenuPage() {
         <div className="container">
           <div className="hero-content">
             <p className="hero-eyebrow">
-              {isArabic ? "منيو جاهز" : "JAHEZ MENU"}
+              {isArabic ? "منيو چاهِز" : "JAHEZ MENU"}
             </p>
             <h1 className="hero-title">
               {isArabic ? "اختاري اللي يسهّل يومك" : "Choose what makes your day easier"}

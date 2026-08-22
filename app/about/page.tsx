@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div className="container jahez-story-hero-grid">
           <div className="jahez-story-hero-copy">
             <span className="kicker light">
-              {isArabic ? "قصة جاهز" : "The Jahez Story"}
+              {isArabic ? "قصة چاهِز" : "The Jahez Story"}
             </span>
             <h1>
               {isArabic ? (
@@ -32,7 +32,7 @@ export default function AboutPage() {
             </h1>
             <p className="jahez-story-hero-lead">
               {isArabic
-                ? "اتعمل جاهز علشان يسهّل عليكِ أكتر مرحلة بتاخد وقت ومجهود في الطبخ: التجهيز. إحنا بنختار ونجهز ونتبل، وإنتِ تكمّلي اللمسة الأخيرة في البيت بسهولة."
+                ? "اتعمل چاهِز علشان يسهّل عليكِ أكتر مرحلة بتاخد وقت ومجهود في الطبخ: التجهيز. إحنا بنختار ونجهز ونتبل، وإنتِ تكمّلي اللمسة الأخيرة في البيت بسهولة."
                 : "Jahez was created to ease the most time-consuming stage of cooking: preparation. We select, prepare and season, so you can add the final touch at home with ease."}
             </p>
             <div className="hero-actions">
@@ -50,7 +50,7 @@ export default function AboutPage() {
                 src="/assets/jahez/fajita-packaging.jpg"
                 alt={
                   isArabic
-                    ? "عبوة فاهيتا دجاج جاهز"
+                    ? "عبوة فاهيتا دجاج چاهِز"
                     : "Jahez chicken fajita packaging"
                 }
                 fill
@@ -77,7 +77,7 @@ export default function AboutPage() {
           <div className="jahez-story-body">
             <p>
               {isArabic
-                ? "جاهز اتعمل علشان يساعد كل ست يومها مليان مسؤوليات، لكنها لسه عايزة تقدم لبيتها أكل بطعم البيت وجودة تثق فيها."
+                ? "چاهِز اتعمل علشان يساعد كل ست يومها مليان مسؤوليات، لكنها لسه عايزة تقدم لبيتها أكل بطعم البيت وجودة تثق فيها."
                 : "Jahez was created to help every homemaker whose day is full of responsibilities, yet who still wants to serve her family food with homestyle taste and quality she trusts."}
             </p>
             <p>
@@ -97,7 +97,7 @@ export default function AboutPage() {
             </p>
             <blockquote className="jahez-story-quote">
               {isArabic
-                ? "جاهز مش بديل عن أكل البيت… جاهز هو اللي بيساعدك تعمليه من غير ما يومك كله يضيع في المطبخ."
+                ? "چاهِز مش بديل عن أكل البيت… چاهِز هو اللي بيساعدك تعمليه من غير ما يومك كله يضيع في المطبخ."
                 : "Jahez does not replace homestyle food. It helps you make it without losing your whole day in the kitchen."}
             </blockquote>
           </div>

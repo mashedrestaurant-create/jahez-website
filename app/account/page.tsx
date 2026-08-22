@@ -46,7 +46,7 @@ const statusLabels: Record<string, { ar: string; en: string }> = {
   new: { ar: "طلب جديد", en: "New" },
   confirmed: { ar: "تم التأكيد", en: "Confirmed" },
   preparing: { ar: "جاري التحضير", en: "Preparing" },
-  ready: { ar: "جاهز", en: "Ready" },
+  ready: { ar: "چاهِز", en: "Ready" },
   out_for_delivery: { ar: "خرج للتوصيل", en: "Out for delivery" },
   completed: { ar: "تم التسليم", en: "Delivered" },
   cancelled: { ar: "ملغي", en: "Cancelled" },

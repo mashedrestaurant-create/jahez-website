@@ -5,6 +5,13 @@ import { useLanguage } from "../language-context";
 
 const faqData = [
   {
+    id: "ready-to-cook",
+    questionAr: "المنتجات جاهزة للأكل ولا محتاجة تسوية؟",
+    answerAr: "ده بيختلف حسب الصنف. بعض المنتجات جاهزة للتسوية، وبعض الوجبات جاهزة أو مطهية. تفاصيل كل منتج وطريقة التعامل معاه بتكون مكتوبة داخل صفحة الصنف.",
+    questionEn: "Are the products ready to eat or do they need cooking?",
+    answerEn: "It depends on the product. Some items are ready to cook, while others are pre-cooked or ready to serve. Details and preparation instructions are listed on each product page.",
+  },
+  {
     id: "advance-order",
     questionAr: "أطلب قبل الموعد بقد إيه؟",
     answerAr: "كل الطلبات لازم تتعمل قبل موعد التوصيل أو الاستلام بـ24 ساعة على الأقل، لأن المنتجات بتتجهز بعناية حسب الطلب.",
@@ -42,16 +49,9 @@ const faqData = [
   {
     id: "pickup",
     questionAr: "ينفع أستلم الطلب بدل التوصيل؟",
-    answerAr: "أيوه، تقدري تختاري الاستلام من نقطة جاهز أثناء إتمام الطلب، وهيظهر لكِ رابط الموقع ومواعيد الاستلام.",
+    answerAr: "أيوه، تقدري تختاري الاستلام من نقطة چاهِز أثناء إتمام الطلب، وهيظهر لكِ رابط الموقع ومواعيد الاستلام.",
     questionEn: "Can I choose pickup instead of delivery?",
     answerEn: "Yes, you can choose pickup from a Jahez point at checkout. The map link and pickup hours will be displayed.",
-  },
-  {
-    id: "ready-to-cook",
-    questionAr: "المنتجات جاهزة للأكل ولا محتاجة تسوية؟",
-    answerAr: "ده بيختلف حسب الصنف. بعض المنتجات جاهزة للتسوية، وبعض الوجبات جاهزة أو مطهية. تفاصيل كل منتج وطريقة التعامل معاه بتكون مكتوبة داخل صفحة الصنف.",
-    questionEn: "Are the products ready to eat or do they need cooking?",
-    answerEn: "It depends on the product. Some items are ready to cook, while others are pre-cooked or ready to serve. Details and preparation instructions are listed on each product page.",
   },
   {
     id: "prices",

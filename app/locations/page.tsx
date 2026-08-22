@@ -81,7 +81,7 @@ export default function LocationsPage() {
               <span className="jahez-location-card-label">
                 {isArabic ? "الاستلام" : "PICKUP"}
               </span>
-              <h2>{isArabic ? "استلام طلبك من نقطة جاهز" : "Pickup from a Jahez point"}</h2>
+              <h2>{isArabic ? "استلام طلبك من نقطة چاهِز" : "Pickup from a Jahez point"}</h2>
             </div>
             <div className="jahez-location-card-body">
               <div className="jahez-pickup-detail">

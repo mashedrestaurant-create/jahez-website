@@ -18,7 +18,7 @@ export default function HomePage() {
         <div className="container hero-grid jahez-hero-grid">
           <div className="hero-copy">
             <span className="eyebrow">
-              {isArabic ? "جاهز — JAHEZ" : "JAHEZ — جاهز"}
+              {isArabic ? "چاهِز — JAHEZ" : "JAHEZ — چاهِز"}
             </span>
             <h1>
               {isArabic ? (
@@ -45,7 +45,7 @@ export default function HomePage() {
                 {isArabic ? "اختاري من المنيو" : "Explore the menu"}
               </Link>
               <Link href="/about" className="button button-ghost">
-                {isArabic ? "اعرفي قصة جاهز" : "Our story"}
+                {isArabic ? "اعرفي قصة چاهِز" : "Our story"}
               </Link>
             </div>
             <div className="hero-info-row">
@@ -92,7 +92,7 @@ export default function HomePage() {
             <div className="hero-image-shell jahez-hero-image">
               <Image
                 src="/assets/jahez/hero-chicken.jpg"
-                alt={isArabic ? "دجاج فاهيتا مجهز من جاهز" : "Prepared chicken fajita from Jahez"}
+                alt={isArabic ? "دجاج فاهيتا مجهز من چاهِز" : "Prepared chicken fajita from Jahez"}
                 fill
                 priority
                 sizes="(max-width: 900px) 92vw, 48vw"
@@ -229,7 +229,7 @@ export default function HomePage() {
             <h2>{isArabic ? "الوقت قليل… لكن طعم البيت مايتعوضش" : "Time is limited, but homestyle taste still matters"}</h2>
             <p>
               {isArabic
-                ? "جاهز اتعمل علشان يساعد ستات البيوت اللي يومهم مليان مسؤوليات، من غير ما يضطروا يختاروا بين الوقت وطعم الأكل البيتي."
+                ? "چاهِز اتعمل علشان يساعد ستات البيوت اللي يومهم مليان مسؤوليات، من غير ما يضطروا يختاروا بين الوقت وطعم الأكل البيتي."
                 : "Jahez was created for busy home-makers who should not have to choose between saving time and serving homestyle food."}
             </p>
             <Link href="/about" className="button button-dark">
@@ -238,7 +238,7 @@ export default function HomePage() {
           </div>
           <Image
             src="/assets/jahez/fajita-packaging.jpg"
-            alt={isArabic ? "عبوة فاهيتا دجاج جاهز" : "Jahez chicken fajita packaging"}
+            alt={isArabic ? "عبوة فاهيتا دجاج چاهِز" : "Jahez chicken fajita packaging"}
             width={853}
             height={1280}
           />
@@ -262,7 +262,7 @@ export default function HomePage() {
             </Link>
             {whatsapp && (
               <a
-                href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(isArabic ? "أهلاً جاهز، عايزة أستفسر" : "Hello Jahez, I have a question")}`}
+                href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(isArabic ? "أهلاً چاهِز، عايزة أستفسر" : "Hello Jahez, I have a question")}`}
                 target="_blank"
                 rel="noreferrer"
                 className="button button-outline-light"

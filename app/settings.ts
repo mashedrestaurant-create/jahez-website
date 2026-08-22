@@ -48,6 +48,9 @@ export type SiteSettings = {
   pickupAddressEn: string;
   deliveryFee: string;
   deliveryZones: string;
+  storeLat: string;
+  storeLng: string;
+  storeAddressAr: string;
   minimumOrder: string;
   freeDeliveryThreshold: string;
   orderLeadHours: string;
@@ -75,32 +78,10 @@ export const defaultSettings: SiteSettings = {
   pickupAddressAr: "نقطة استلام جاهز — التجمع، افتحي الخريطة للوصول للموقع",
   pickupAddressEn: "Jahez pickup point — New Cairo. Open the map for directions",
   deliveryFee: "0",
-  deliveryZones: JSON.stringify([
-    {
-      id: "new-cairo",
-      nameAr: "التجمع",
-      nameEn: "New Cairo",
-      areasAr: "التجمع الأول، الثالث، الخامس والمناطق المحيطة",
-      areasEn: "First, Third and Fifth Settlement and nearby areas",
-      fee: 0,
-      minimumOrder: 0,
-      freeDeliveryThreshold: 0,
-      etaMinutes: 0,
-      active: true,
-    },
-    {
-      id: "rehab",
-      nameAr: "الرحاب",
-      nameEn: "Al Rehab",
-      areasAr: "مدينة الرحاب",
-      areasEn: "Al Rehab City",
-      fee: 0,
-      minimumOrder: 0,
-      freeDeliveryThreshold: 0,
-      etaMinutes: 0,
-      active: true,
-    },
-  ]),
+  deliveryZones: "[]",
+  storeLat: "29.9602",
+  storeLng: "31.2569",
+  storeAddressAr: "المعادي، القاهرة",
   minimumOrder: "0",
   freeDeliveryThreshold: "0",
   orderLeadHours: "24",

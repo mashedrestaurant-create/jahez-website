@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { customers, orders } from "@/db/schema";
+import { prisma } from "../../../../lib/prisma";
 import { normalizeEgyptianMobile } from "../../../../egypt-phone";
 
 export const dynamic = "force-dynamic";
@@ -12,66 +10,53 @@ export async function GET(
   try {
     const { id } = await params;
     const url = new URL(request.url);
-    const phone =
-      normalizeEgyptianMobile(url.searchParams.get("phone") || "") || "";
+    const phone = normalizeEgyptianMobile(url.searchParams.get("phone") || "") || "";
 
     if (!phone) {
-      return Response.json(
-        { error: "Phone is required" },
-        { status: 400 },
-      );
+      return Response.json({ error: "Phone is required" }, { status: 400 });
     }
 
-    const orderId = Number(id);
-    if (!Number.isFinite(orderId) || orderId <= 0) {
-      return Response.json(
-        { error: "Invalid order ID" },
-        { status: 400 },
-      );
+    const orderNumber = Number(id);
+    if (!Number.isInteger(orderNumber) || orderNumber <= 0) {
+      return Response.json({ error: "Invalid order ID" }, { status: 400 });
     }
 
-    const db = getDb();
-
-    const [order] = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.id, orderId))
-      .limit(1);
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      include: { items: true },
+    });
 
     if (!order) {
-      return Response.json(
-        { error: "Order not found" },
-        { status: 404 },
-      );
+      return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.id, order.customerId))
-      .limit(1);
-
-    if (!customer || customer.phone !== phone) {
+    if (order.customerPhoneNorm !== phone) {
       return Response.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     return Response.json({
       order: {
-        ...order,
-        items: (() => {
-          try {
-            return JSON.parse(order.itemsJson);
-          } catch {
-            return [];
-          }
-        })(),
+        id: order.orderNumber,
+        status: order.status,
+        subtotal: Math.round(order.subtotal) / 100,
+        deliveryFee: Math.round(order.deliveryFee) / 100,
+        discountAmount: Math.round(order.discountAmount) / 100,
+        total: Math.round(order.total) / 100,
+        fulfillment: order.type,
+        address: order.address,
+        notes: order.notes,
+        paymentMethod: order.paymentMethodType,
+        paymentStatus: order.paymentStatus,
+        createdAt: order.createdAt,
+        items: order.items.map((item) => ({
+          name: item.productNameAr || item.productNameEn || "منتج",
+          price: Math.round(item.unitPrice) / 100,
+          quantity: item.quantity,
+        })),
       },
     });
   } catch (error) {
     console.error("Order detail fetch failed", error);
-    return Response.json(
-      { error: "Failed to fetch order" },
-      { status: 500 },
-    );
+    return Response.json({ error: "Failed to fetch order" }, { status: 500 });
   }
 }

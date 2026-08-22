@@ -18,24 +18,19 @@ export async function PUT(request: NextRequest) {
   if (!body.items || !Array.isArray(body.items)) {
     return err("items array required");
   }
-  await prisma.$transaction(
-    body.items.map((item: { section: string; key: string; value: string; sortOrder?: number; active?: boolean }) =>
-      prisma.siteContent.upsert({
-        where: { section_key: { section: item.section, key: item.key } },
-        update: {
-          value: item.value,
-          sortOrder: item.sortOrder ?? 0,
-          active: item.active ?? true,
-        },
-        create: {
-          section: item.section,
-          key: item.key,
-          value: item.value,
-          sortOrder: item.sortOrder ?? 0,
-          active: item.active ?? true,
-        },
-      })
-    )
-  );
+  // Neon HTTP adapter: no transactions/upserts — single-statement SQL per row
+  for (const item of body.items as { section: string; key: string; value: string; sortOrder?: number; active?: boolean }[]) {
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO "SiteContent" ("id", "section", "key", "value", "sortOrder", "active")
+       VALUES (gen_random_uuid()::text, $1, $2, $3, $4, $5)
+       ON CONFLICT ("section", "key")
+       DO UPDATE SET "value" = $3, "sortOrder" = $4, "active" = $5`,
+      String(item.section || "").slice(0, 60),
+      String(item.key || "").slice(0, 120),
+      String(item.value ?? ""),
+      Number.isFinite(Number(item.sortOrder)) ? Math.trunc(Number(item.sortOrder)) : 0,
+      item.active !== false,
+    );
+  }
   return json({ ok: true, updated: body.items.length });
 }

@@ -21,15 +21,14 @@ export async function PUT(request: NextRequest) {
     return err("settings object required");
   }
   const entries = Object.entries(body.settings) as [string, unknown][];
-  await prisma.$transaction(
-    entries.map(([key, value]) => {
-      const jsonValue = JSON.stringify(value);
-      return prisma.siteSetting.upsert({
-        where: { key },
-        update: { value: jsonValue },
-        create: { key, value: jsonValue },
-      });
-    })
-  );
+  // Neon HTTP adapter: no transactions/upserts — single-statement SQL per row
+  for (const [key, value] of entries) {
+    const jsonValue = JSON.stringify(value);
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO "SiteSetting" ("key", "value") VALUES ($1, $2::jsonb)
+       ON CONFLICT ("key") DO UPDATE SET "value" = $2::jsonb`,
+      key.slice(0, 120), jsonValue,
+    );
+  }
   return json({ ok: true, updated: entries.length });
 }

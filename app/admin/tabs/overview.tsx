@@ -6,7 +6,7 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   new: { label: "جديد", color: "#2563eb", bg: "#eff6ff" },
   confirmed: { label: "مؤكد", color: "#ca8a04", bg: "#fefce8" },
   preparing: { label: "قيد التحضير", color: "#ea580c", bg: "#fff7ed" },
-  ready: { label: "جاهز", color: "#16a34a", bg: "#f0fdf4" },
+  ready: { label: "چاهِز", color: "#16a34a", bg: "#f0fdf4" },
   out_for_delivery: { label: "قيد التوصيل", color: "#9333ea", bg: "#faf5ff" },
   completed: { label: "مكتمل", color: "#059669", bg: "#ecfdf5" },
   cancelled: { label: "ملغي", color: "#dc2626", bg: "#fef2f2" },

@@ -25,7 +25,7 @@ export default function DriverLoginPage() {
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#0a2d1d" }}>
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "#0a2d1d" }}>جاهز</h1>
+          <h1 className="text-3xl font-bold" style={{ color: "#0a2d1d" }}>چاهِز</h1>
           <p className="text-gray-500 mt-1">لوحة الطيار</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

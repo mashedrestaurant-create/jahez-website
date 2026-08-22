@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { customers, orders } from "@/db/schema";
+import { prisma } from "../../../lib/prisma";
 import { normalizeEgyptianMobile } from "../../../egypt-phone";
 
 export const dynamic = "force-dynamic";
@@ -8,55 +6,50 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    const phone =
-      normalizeEgyptianMobile(url.searchParams.get("phone") || "") || "";
-    const name =
-      url.searchParams.get("name")?.trim().slice(0, 90) || "";
+    const phone = normalizeEgyptianMobile(url.searchParams.get("phone") || "") || "";
+    const name = url.searchParams.get("name")?.trim().slice(0, 90) || "";
 
     if (!phone || name.length < 2) {
-      return Response.json(
-        { error: "Phone and name are required" },
-        { status: 400 },
-      );
+      return Response.json({ error: "Phone and name are required" }, { status: 400 });
     }
 
-    const db = getDb();
-
-    const [customer] = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.phone, phone))
-      .limit(1);
+    const customer = await prisma.customer.findUnique({
+      where: { normalizedPhone: phone },
+      include: {
+        orders: {
+          orderBy: { createdAt: "desc" },
+          take: 50,
+          include: { items: true },
+        },
+      },
+    });
 
     if (!customer) {
       return Response.json({ orders: [] });
     }
 
-    if (
-      customer.name.trim().toLowerCase() !== name.trim().toLowerCase()
-    ) {
-      return Response.json(
-        { error: "Name does not match" },
-        { status: 403 },
-      );
+    if (customer.name.trim().toLowerCase() !== name.trim().toLowerCase()) {
+      return Response.json({ error: "Name does not match" }, { status: 403 });
     }
 
-    const customerOrders = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.customerId, customer.id))
-      .orderBy(orders.createdAt)
-      .limit(50);
-
-    const parsedOrders = customerOrders.map((order) => ({
-      ...order,
-      items: (() => {
-        try {
-          return JSON.parse(order.itemsJson);
-        } catch {
-          return [];
-        }
-      })(),
+    const parsedOrders = customer.orders.map((order) => ({
+      id: order.orderNumber,
+      status: order.status,
+      subtotal: Math.round(order.subtotal) / 100,
+      deliveryFee: Math.round(order.deliveryFee) / 100,
+      discountAmount: Math.round(order.discountAmount) / 100,
+      total: Math.round(order.total) / 100,
+      fulfillment: order.type,
+      address: order.address,
+      notes: order.notes,
+      paymentMethod: order.paymentMethodType,
+      paymentStatus: order.paymentStatus,
+      createdAt: order.createdAt,
+      items: order.items.map((item) => ({
+        name: item.productNameAr || item.productNameEn || "منتج",
+        price: Math.round(item.unitPrice) / 100,
+        quantity: item.quantity,
+      })),
     }));
 
     return Response.json({
