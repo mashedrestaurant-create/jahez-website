@@ -876,13 +876,6 @@ export default function CartPage() {
                       : `Distance from store: ${deliveryQuote!.distanceKm} km — delivery fee ${formatPrice(deliveryFee)}`}
                   </p>
                 )}
-                {form.fulfillment === "delivery" && !form.location && (
-                  <p className="delivery-price-note">
-                    {isArabic
-                      ? "التوصيل: أول 5 كم بـ 35 ج.م، وكل كيلو زيادة بـ 10 ج.م — حددي موقعك على الخريطة للحساب بالظبط"
-                      : "Delivery: first 5 km = EGP 35, each extra km = EGP 10 — pick your map location for the exact price."}
-                  </p>
-                )}
                 {form.fulfillment === "delivery" && (
                   <label>
                     <span>{isArabic ? "عنوان التوصيل" : "Delivery address"} <span className="required-star">*</span></span>

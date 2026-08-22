@@ -5,8 +5,8 @@ export const DELIVERY_BASE_KM = 5;
 export const DELIVERY_PER_KM_FEE = 10;
 export const DELIVERY_MAX_KM = 30;
 
-const DEFAULT_STORE_LAT = 29.9602;
-const DEFAULT_STORE_LNG = 31.2569;
+const DEFAULT_STORE_LAT = 30.005137;
+const DEFAULT_STORE_LNG = 31.477191;
 
 export function getStoreLocation(settings: SiteSettings): { lat: number; lng: number } {
   const lat = Number(settings.storeLat);

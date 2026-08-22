@@ -51,6 +51,7 @@ export type SiteSettings = {
   storeLat: string;
   storeLng: string;
   storeAddressAr: string;
+  storeMapsUrl: string;
   socialInstagram: string;
   socialFacebook: string;
   socialTiktok: string;
@@ -77,14 +78,15 @@ export const defaultSettings: SiteSettings = {
   accentColor: "#C9A23B",
   creamColor: "#F7F0DF",
   whatsappNumber: "",
-  mapsUrl: "https://maps.app.goo.gl/NX9LeV2DjT1GiFyF7?g_st=iw",
+  mapsUrl: "https://maps.app.goo.gl/PiqQRLCs3oQ9m7178",
   pickupAddressAr: "نقطة استلام جاهز — التجمع، افتحي الخريطة للوصول للموقع",
   pickupAddressEn: "Jahez pickup point — New Cairo. Open the map for directions",
   deliveryFee: "0",
   deliveryZones: "[]",
-  storeLat: "29.9602",
-  storeLng: "31.2569",
-  storeAddressAr: "المعادي، القاهرة",
+  storeLat: "30.005137",
+  storeLng: "31.477191",
+  storeAddressAr: "التجمع الخامس، القاهرة الجديدة",
+  storeMapsUrl: "https://maps.app.goo.gl/PiqQRLCs3oQ9m7178",
   socialInstagram: "https://www.instagram.com/jahezkitchen",
   socialFacebook: "https://www.facebook.com/share/1BfGbhLjw9/",
   socialTiktok: "https://www.tiktok.com/@jahez.kitchen",

@@ -122,6 +122,7 @@ export function SettingsTab() {
         </p>
         <Field label="خط العرض Latitude (مثال: 29.9602)" keyName="storeLat" />
         <Field label="خط الطول Longitude (مثال: 31.2569)" keyName="storeLng" />
+        <Field label="لينك الفرع على جوجل مابس" keyName="storeMapsUrl" span />
       </Section>
 
       <Section title="الدفع">
