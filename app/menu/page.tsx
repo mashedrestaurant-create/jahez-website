@@ -15,9 +15,9 @@ import { PlainImage as Image } from "../plain-image";
 export default function MenuPage() {
   const { isArabic, t } = useLanguage();
   const { products, categoryMedia } = useCatalog();
+  const { items, addItem, updateQuantity } = useCart();
   const [active, setActive] = useState<CategoryId | "all">("all");
   const [query, setQuery] = useState("");
-  const { addItem } = useCart();
 
   useEffect(() => {
     const hash = window.location.hash.replace("#", "") as CategoryId;
@@ -171,20 +171,55 @@ export default function MenuPage() {
                         </div>
                         <div className="menu-item-action">
                           <b>{formatPrice(product.price)}</b>
-                          <button
-                            aria-label={`${t("add")} ${isArabic ? product.name : product.nameEn}`}
-                            onClick={() =>
-                              addItem({
-                                id: product.id,
-                                name: isArabic ? product.name : product.nameEn,
-                                price: product.price,
-                                details: `${isArabic ? "وحدة البيع" : "Unit"}: ${isArabic ? product.unit : product.unitEn}`,
-                              })
+                          {(() => {
+                            const entry = items.find((i) => i.id === product.id);
+                            const qty = entry?.quantity ?? 0;
+                            const details = `${isArabic ? "وحدة البيع" : "Unit"}: ${isArabic ? product.unit : product.unitEn}`;
+                            const name = isArabic ? product.name : product.nameEn;
+                            if (qty === 0) {
+                              return (
+                                <button
+                                  aria-label={`${t("add")} ${name}`}
+                                  onClick={() =>
+                                    addItem({
+                                      id: product.id,
+                                      name,
+                                      price: product.price,
+                                      details,
+                                    })
+                                  }
+                                >
+                                  <span>+</span>
+                                  <small>{t("add")}</small>
+                                </button>
+                              );
                             }
-                          >
-                            <span>+</span>
-                            <small>{t("add")}</small>
-                          </button>
+                            return (
+                              <div className="menu-qty-stepper" aria-label={name}>
+                                <button
+                                  type="button"
+                                  className="qty-minus"
+                                  aria-label={isArabic ? "أنقص واحد" : "Decrease quantity"}
+                                  onClick={() =>
+                                    entry && updateQuantity(entry.key, entry.quantity - 1)
+                                  }
+                                >
+                                  −
+                                </button>
+                                <span className="menu-qty-value">{qty}</span>
+                                <button
+                                  type="button"
+                                  className="qty-plus"
+                                  aria-label={isArabic ? "زود واحد" : "Increase quantity"}
+                                  onClick={() =>
+                                    addItem({ id: product.id, name, price: product.price, details })
+                                  }
+                                >
+                                  +
+                                </button>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </article>
                     ))}
