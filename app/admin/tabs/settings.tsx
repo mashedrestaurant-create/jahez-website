@@ -91,7 +91,7 @@ export function SettingsTab() {
         <Field label="نص الوصف (إنجليزي)" keyName="heroSubtitleEn" />
       </Section>
 
-      <Section title="الenenو للعربية">
+      <Section title="الشعار التسويقي">
         <Field label="شعار الموقع (عربي)" keyName="taglineAr" />
         <Field label="شعار الموقع (إنجليزي)" keyName="taglineEn" />
       </Section>
@@ -115,6 +115,121 @@ export function SettingsTab() {
         <Field label="حساب الانستاباي" keyName="instapayAccount" />
         <Field label="رابط الدفع" keyName="instapayPaymentLink" />
       </Section>
+
+      <BackupsSection />
+    </div>
+  );
+}
+
+type Backup = {
+  id: string;
+  label: string | null;
+  sizeBytes: number;
+  counts: { categories?: number; products?: number; orders?: number; customers?: number; settings?: number } | null;
+  createdBy: string | null;
+  createdAt: string;
+};
+
+function BackupsSection() {
+  const [backups, setBackups] = useState<Backup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState("");
+  const [msg, setMsg] = useState("");
+
+  const load = () => {
+    setLoading(true);
+    fetch("/api/admin/backup").then(r => r.json()).then(d => {
+      setBackups(d.backups || []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const createBackup = async () => {
+    setBusy("create"); setMsg("");
+    try {
+      const res = await fetch("/api/admin/backup", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "create", label: "manual" }) });
+      const d = await res.json();
+      setMsg(d.ok ? "تم إنشاء نسخة احتياطية ✓" : d.error || "فشل الإنشاء");
+      if (d.ok) load();
+    } catch { setMsg("فشل الاتصال"); }
+    setBusy("");
+    setTimeout(() => setMsg(""), 4000);
+  };
+
+  const restore = async (b: Backup) => {
+    const confirmed = window.confirm(
+      `⚠️ استعادة النسخة من ${new Date(b.createdAt).toLocaleString("ar-EG")}؟\n\nهذا هيمسح كل البيانات الحالية ويستبدلها بمحتوى النسخة الاحتياطية.\nمتأكد؟`
+    );
+    if (!confirmed) return;
+    const secondConfirm = window.confirm("تأكيد أخير: متأكد إنك عايز تستعيد هذه النسخة؟");
+    if (!secondConfirm) return;
+
+    setBusy(b.id); setMsg("");
+    try {
+      const res = await fetch("/api/admin/backup", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "restore", id: b.id }) });
+      const d = await res.json();
+      setMsg(d.ok ? `تمت الاستعادة ✓ (${d.restored} جدول)` : d.error || "فشلت الاستعادة");
+    } catch { setMsg("فشل الاتصال"); }
+    setBusy("");
+    setTimeout(() => setMsg(""), 6000);
+  };
+
+  const remove = async (b: Backup) => {
+    if (!window.confirm("حذف هذه النسخة الاحتياطية؟")) return;
+    setBusy(b.id);
+    try {
+      await fetch(`/api/admin/backup?id=${b.id}`, { method: "DELETE" });
+      load();
+    } catch {}
+    setBusy("");
+  };
+
+  const fmtSize = (bytes: number) => bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-4">
+      <div className="flex justify-between items-center mb-1 pb-2 border-b">
+        <h4 className="font-semibold" style={{ color: "#0a2d1d", fontFamily: "Cairo, sans-serif" }}>💾 النسخ الاحتياطي التلقائي</h4>
+        <button onClick={createBackup} disabled={busy === "create"} className="px-4 py-1.5 text-white rounded-lg text-xs font-bold disabled:opacity-50" style={{ background: "#0a2d1d" }}>
+          {busy === "create" ? "جاري النسخ..." : "+ نسخة الآن"}
+        </button>
+      </div>
+      <p className="text-xs mt-2 mb-4" style={{ color: "#9ca3af" }}>
+        نسخة تلقائية يومياً الساعة 3 صباحاً — تُحفظ آخر 30 نسخة. تشمل المنتجات والأقسام والطلبات والعملاء والإعدادات.
+      </p>
+
+      {msg && <div className="rounded-lg px-3 py-2 text-sm font-bold mb-3" style={{ background: "#f0fdf4", color: "#166534" }}>{msg}</div>}
+
+      {loading ? (
+        <p className="text-sm py-4 text-center" style={{ color: "#9ca3af" }}>جاري التحميل...</p>
+      ) : backups.length === 0 ? (
+        <p className="text-sm py-4 text-center" style={{ color: "#9ca3af" }}>لا توجد نسخ بعد — اضغط "نسخة الآن"</p>
+      ) : (
+        <div className="space-y-2">
+          {backups.map(b => (
+            <div key={b.id} className="flex items-center justify-between gap-3 flex-wrap rounded-lg border border-gray-100 px-3 py-2">
+              <div className="min-w-0">
+                <p className="text-xs font-bold" style={{ color: "#0a2d1d" }}>
+                  {new Date(b.createdAt).toLocaleString("ar-EG")}
+                  {b.label && <span className="mr-2 rounded-full px-2 py-0.5 text-[10px]" style={{ background: b.label === "auto-daily" ? "#eff6ff" : "#fefce8", color: b.label === "auto-daily" ? "#1d4ed8" : "#a16207" }}>{b.label === "auto-daily" ? "تلقائي" : b.label}</span>}
+                </p>
+                <p className="text-[11px]" style={{ color: "#9ca3af" }}>
+                  {fmtSize(b.sizeBytes)} · {b.counts?.products ?? "?"} منتج · {b.counts?.orders ?? "?"} طلب · {b.createdBy || "-"}
+                </p>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <a href={`/api/admin/backup?id=${b.id}`} className="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50" style={{ color: "#374151" }}>تحميل</a>
+                <button onClick={() => restore(b)} disabled={busy === b.id} className="text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50" style={{ background: "#fff7ed", color: "#c2410c" }}>
+                  {busy === b.id ? "..." : "استعادة"}
+                </button>
+                <button onClick={() => remove(b)} disabled={busy === b.id} className="text-xs font-bold px-2 py-1.5 rounded-lg hover:bg-red-50" style={{ color: "#dc2626" }}>✕</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

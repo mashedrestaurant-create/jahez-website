@@ -1,8 +1,17 @@
 import { NextRequest } from "next/server";
 import { authenticate, json, err } from "../../../lib/crud";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { prisma } from "../../../lib/prisma";
+import sharp from "sharp";
+
+export const maxDuration = 60;
+
+const MAX_INPUT_BYTES = 25 * 1024 * 1024; // 25MB
+
+const SUPPORTED = new Set([
+  "image/jpeg", "image/png", "image/webp", "image/gif", "image/avif",
+  "image/tiff", "image/bmp", "image/heic", "image/heif", "image/svg+xml",
+  "image/x-icon", "image/vnd.microsoft.icon", "image/jp2", "image/jxl",
+]);
 
 export async function POST(request: NextRequest) {
   const { auth, response } = await authenticate(request, "products:write");
@@ -10,26 +19,80 @@ export async function POST(request: NextRequest) {
 
   try {
     const formData = await request.formData();
-    const file = formData.get("file") as File | null;
-    if (!file) return err("No file provided");
+    const entry = formData.get("file") ?? formData.get("image");
+    if (!(entry instanceof File)) return err("No file provided", 400);
+    if (entry.size === 0) return err("Empty file", 400);
+    if (entry.size > MAX_INPUT_BYTES) return err("File too large (max 25MB)", 413);
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const inputBuffer = Buffer.from(await entry.arrayBuffer());
 
-    const ext = file.name.split(".").pop() || "jpg";
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    let pipeline = sharp(inputBuffer, { animated: false, failOn: "none" });
+    let meta;
+    try {
+      meta = await pipeline.metadata();
+    } catch {
+      return err("Unsupported or corrupted image file", 400);
+    }
+    if (!meta || !meta.format) return err("Unsupported or corrupted image file", 400);
 
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
+    // SVG passes through untouched (vector)
+    if (meta.format === "svg") {
+      const svg = inputBuffer.subarray(0, 4096).toString("utf8").toLowerCase();
+      if (!svg.includes("<svg")) return err("Invalid SVG file", 400);
+      const created = await prisma.mediaFile.create({
+        data: {
+          mime: "image/svg+xml",
+          sizeBytes: inputBuffer.length,
+          originalName: (entry.name || "image.svg").slice(0, 200),
+          data: inputBuffer,
+        },
+      });
+      return json({ ok: true, url: `/api/media/${created.id}`, id: created.id, width: null, height: null, sizeBytes: inputBuffer.length });
     }
 
-    const filepath = join(uploadDir, filename);
-    await writeFile(filepath, buffer);
+    if (!SUPPORTED.has(`image/${meta.format}`) && meta.format !== "heif" && meta.format !== "magick") {
+      // sharp already parsed it — trust the decoder over the declared mime
+    }
 
-    const url = `/uploads/${filename}`;
-    return json({ ok: true, url, filename });
+    // Process: auto-rotate by EXIF, resize to fit 1600px, convert to webp
+    const processed = await pipeline
+      .rotate()
+      .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82, effort: 4 })
+      .toBuffer({ resolveWithObject: true });
+
+    const out = processed.data;
+    if (out.length > 8 * 1024 * 1024) {
+      // Extremely rare after resize; re-compress harder as a safeguard
+      const smaller = await sharp(inputBuffer, { failOn: "none" })
+        .rotate()
+        .resize({ width: 1200, height: 1200, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 68 })
+        .toBuffer({ resolveWithObject: true });
+      Object.assign(processed, smaller);
+    }
+
+    const created = await prisma.mediaFile.create({
+      data: {
+        mime: "image/webp",
+        width: processed.info.width,
+        height: processed.info.height,
+        sizeBytes: processed.data.length,
+        originalName: (entry.name || "image").slice(0, 200),
+        data: processed.data,
+      },
+    });
+
+    return json({
+      ok: true,
+      url: `/api/media/${created.id}`,
+      id: created.id,
+      width: processed.info.width,
+      height: processed.info.height,
+      sizeBytes: processed.data.length,
+      originalSize: inputBuffer.length,
+    });
   } catch (e: any) {
-    return err(e.message || "Upload failed");
+    return err(e?.message || "Upload failed", 500);
   }
 }

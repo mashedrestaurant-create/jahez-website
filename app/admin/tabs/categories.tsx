@@ -35,87 +35,7 @@ const EMPTY_FORM: FormState = {
   imageId: "", videoUrl: "", icon: "", sortOrder: "0", active: true,
 };
 
-function MediaUpload({ imageValue, videoValue, onImageChange, onVideoChange }: {
-  imageValue: string; videoValue: string;
-  onImageChange: (url: string) => void; onVideoChange: (url: string) => void;
-}) {
-  const [uploading, setUploading] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const upload = async (file: File) => {
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const d = await res.json();
-      if (d.ok) onImageChange(d.url);
-    } catch {}
-    setUploading(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) upload(file);
-  };
-
-  return (
-    <div className="space-y-3">
-      {/* Image upload */}
-      <div
-        className={`relative border-2 border-dashed rounded-xl p-4 text-center transition-colors cursor-pointer ${dragOver ? "border-[#c9a23b] bg-[#c9a23b]/5" : "border-gray-200 hover:border-gray-300"}`}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-      >
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) upload(file);
-        }} />
-        {imageValue ? (
-          <div className="relative inline-block">
-            <img src={imageValue} alt="" className="h-24 w-40 object-cover rounded-lg" />
-            <button
-              onClick={(e) => { e.stopPropagation(); onImageChange(""); }}
-              className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
-            >✕</button>
-          </div>
-        ) : (
-          <p className="text-sm" style={{ color: "#6b7280" }}>{uploading ? "جاري الرفع..." : "اسحب صورة القسم هنا أو اضغط للتحميل"}</p>
-        )}
-      </div>
-
-      {/* Video URL */}
-      <div>
-        <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>رابط فيديو (YouTube / MP4) — اختياري</label>
-        <input
-          dir="ltr"
-          value={videoValue}
-          onChange={(e) => onVideoChange(e.target.value)}
-          placeholder="https://youtube.com/watch?v=... أو https://example.com/video.mp4"
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#c9a23b] focus:border-transparent"
-        />
-        {videoValue && (
-          <div className="mt-2">
-            {videoValue.includes("youtube.com") || videoValue.includes("youtu.be") ? (
-              <iframe
-                src={`https://www.youtube.com/embed/${videoValue.includes("youtu.be") ? videoValue.split("/").pop()?.split("?")[0] : new URL(videoValue).searchParams.get("v")}`}
-                className="w-full h-40 rounded-lg"
-                allowFullScreen
-              />
-            ) : (
-              <video src={videoValue} className="w-full h-40 rounded-lg object-cover" controls />
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+import { ImageUploader } from "../components/image-uploader";
 
 export function CategoriesTab() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -217,12 +137,18 @@ export function CategoriesTab() {
             </h3>
 
             <div className="mb-4">
-              <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>صورة / فيديو القسم</label>
-              <MediaUpload
-                imageValue={form.imageId}
-                videoValue={form.videoUrl}
-                onImageChange={(url) => setForm({ ...form, imageId: url })}
-                onVideoChange={(url) => setForm({ ...form, videoUrl: url })}
+              <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>صورة القسم</label>
+              <ImageUploader value={form.imageId} onChange={(url) => setForm({ ...form, imageId: url })} height={96} />
+            </div>
+
+            <div className="mb-4">
+              <label className="mb-1 block text-xs font-bold" style={{ color: "#6b7280" }}>رابط فيديو (YouTube / MP4) — اختياري</label>
+              <input
+                dir="ltr"
+                value={form.videoUrl}
+                onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+                placeholder="https://youtube.com/watch?v=... أو https://example.com/video.mp4"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#c9a23b] focus:border-transparent"
               />
             </div>
 

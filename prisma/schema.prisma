@@ -485,6 +485,29 @@ model MediaAsset {
   updatedAt    DateTime @updatedAt
 }
 
+// ─── 24b. MediaFile (DB-stored images — survives deploys) ──
+model MediaFile {
+  id           String   @id @default(cuid())
+  mime         String   @default("image/webp")
+  width        Int?
+  height       Int?
+  sizeBytes    Int      @default(0)
+  originalName String?
+  data         Bytes
+  createdAt    DateTime @default(now())
+}
+
+// ─── 24c. BackupSnapshot (automatic daily backups) ──
+model BackupSnapshot {
+  id        String   @id @default(cuid())
+  label     String?
+  sizeBytes Int      @default(0)
+  counts    Json?
+  createdBy String?
+  createdAt DateTime @default(now())
+  data      Json
+}
+
 // ─── 25. SiteSetting ─────────────────────────────────
 model SiteSetting {
   key   String @id
