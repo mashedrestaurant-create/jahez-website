@@ -1,11 +1,19 @@
 import { NextRequest } from "next/server";
 import { authenticate, json, err } from "../../../lib/crud";
 import { prisma } from "../../../lib/prisma";
-import sharp from "sharp";
 
 export const maxDuration = 60;
 
 const MAX_INPUT_BYTES = 25 * 1024 * 1024; // 25MB
+
+async function loadSharp() {
+  try {
+    const mod = await import("sharp").catch(() => null);
+    return mod?.default ?? null;
+  } catch {
+    return null;
+  }
+}
 
 const SUPPORTED = new Set([
   "image/jpeg", "image/png", "image/webp", "image/gif", "image/avif",
@@ -25,6 +33,22 @@ export async function POST(request: NextRequest) {
     if (entry.size > MAX_INPUT_BYTES) return err("File too large (max 25MB)", 413);
 
     const inputBuffer = Buffer.from(await entry.arrayBuffer());
+
+    const sharp = await loadSharp();
+
+    // Fallback: store original bytes if sharp is unavailable
+    if (!sharp) {
+      const mime = entry.type && entry.type.startsWith("image/") ? entry.type : "application/octet-stream";
+      const created = await prisma.mediaFile.create({
+        data: {
+          mime,
+          sizeBytes: inputBuffer.length,
+          originalName: (entry.name || "image").slice(0, 200),
+          data: inputBuffer,
+        },
+      });
+      return json({ ok: true, url: `/api/media/${created.id}`, id: created.id, width: null, height: null, sizeBytes: inputBuffer.length, originalSize: inputBuffer.length });
+    }
 
     let pipeline = sharp(inputBuffer, { animated: false, failOn: "none" });
     let meta;
