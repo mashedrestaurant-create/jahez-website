@@ -1132,6 +1132,35 @@ img {
   font-weight: 700;
 }
 
+.footer-social {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0 4px;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(201, 162, 59, 0.15);
+  color: var(--jahez-gold);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-social a:hover {
+  background: var(--jahez-gold);
+  color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.footer-social svg {
+  width: 18px;
+  height: 18px;
+}
+
 .footer-copy {
   max-width: 300px;
   margin: 6px 0 0;
@@ -8177,3 +8206,6 @@ body {
     font-size: 10px;
   }
 }
+
+.contact-social a { width: auto; padding: 0 14px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; }
+

@@ -84,6 +84,13 @@ export function SettingsTab() {
         <Field label="الشعار (رابط صورة)" keyName="logo" span />
       </Section>
 
+
+      <Section title="السوشيال ميديا">
+        <Field label="إنستجرام" keyName="socialInstagram" span />
+        <Field label="فيسبوك" keyName="socialFacebook" span />
+        <Field label="تيك توك" keyName="socialTiktok" span />
+      </Section>
+
       <Section title="الهيرو — الصفحة الرئيسية">
         <Field label="العنوان الرئيسي (عربي)" keyName="heroTitleAr" />
         <Field label="العنوان الرئيسي (إنجليزي)" keyName="heroTitleEn" />

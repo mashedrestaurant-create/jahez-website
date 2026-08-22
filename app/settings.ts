@@ -51,6 +51,9 @@ export type SiteSettings = {
   storeLat: string;
   storeLng: string;
   storeAddressAr: string;
+  socialInstagram: string;
+  socialFacebook: string;
+  socialTiktok: string;
   minimumOrder: string;
   freeDeliveryThreshold: string;
   orderLeadHours: string;
@@ -82,6 +85,9 @@ export const defaultSettings: SiteSettings = {
   storeLat: "29.9602",
   storeLng: "31.2569",
   storeAddressAr: "المعادي، القاهرة",
+  socialInstagram: "https://www.instagram.com/jahezkitchen",
+  socialFacebook: "https://www.facebook.com/share/1BfGbhLjw9/",
+  socialTiktok: "https://www.tiktok.com/@jahez.kitchen",
   minimumOrder: "0",
   freeDeliveryThreshold: "0",
   orderLeadHours: "24",
