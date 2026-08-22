@@ -17,6 +17,18 @@ export type CategoryMedia = {
   videoUrl?: string;
 };
 
+/**
+ * Bump when media-serving behavior changes: appended as ?v=N to /api/media/*
+ * URLs so browsers fetch fresh bytes instead of using poisoned caches.
+ */
+const MEDIA_CACHE_VERSION = "2";
+
+function withMediaVersion(url?: string | null): string | undefined {
+  if (!url || !url.startsWith("/api/media/")) return url || undefined;
+  if (url.includes("?v=")) return url;
+  return `${url}?v=${MEDIA_CACHE_VERSION}`;
+}
+
 export async function loadCategoryMedia(): Promise<Record<string, CategoryMedia>> {
   try {
     const dbCats = await prisma.category.findMany();
@@ -24,7 +36,7 @@ export async function loadCategoryMedia(): Promise<Record<string, CategoryMedia>
     for (const c of dbCats) {
       map[c.slug] = {
         slug: c.slug,
-        image: c.imageId || undefined,
+        image: withMediaVersion(c.imageId),
         videoUrl: c.videoUrl || undefined,
       };
     }
@@ -69,7 +81,7 @@ export async function loadManagedProducts(includeInactive = false): Promise<Mana
         descriptionEn: p.descriptionEn || fallback?.descriptionEn,
         unit: p.shortDescriptionAr || fallback?.unit || "كيلو كامل",
         unitEn: p.shortDescriptionEn || fallback?.unitEn || "Full kg",
-        image: p.imageId || fallback?.image,
+        image: withMediaVersion(p.imageId) || fallback?.image,
         price: p.price,
         featured: p.featured,
         spicy: p.spicy,
