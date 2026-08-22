@@ -82,8 +82,8 @@ export default function HomePage() {
                   </svg>
                 </span>
                 <div className="hero-info-text">
-                  <strong>{isArabic ? "التجمع والرحاب" : "New Cairo & Al Rehab"}</strong>
-                  <span>{isArabic ? "مناطق التوصيل الحالية" : "Current delivery areas"}</span>
+                  <strong>{isArabic ? "التجمع الخامس" : "Fifth Settlement"}</strong>
+                  <span>{isArabic ? "فرعنا — وتوصيل حسب المسافة" : "Our branch — distance-based delivery"}</span>
                 </div>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function HomePage() {
           <article>
             <b>03</b>
             <h3>{isArabic ? "توصيل أو استلام" : "Delivery or pickup"}</h3>
-            <p>{isArabic ? "التوصيل متاح للتجمع والرحاب، أو اختاري الاستلام." : "Delivery is available in New Cairo and Al Rehab, or choose pickup."}</p>
+            <p>{isArabic ? "توصيل حسب المسافة من الفرع، أو اختاري الاستلام." : "Distance-based delivery from our branch, or choose pickup."}</p>
           </article>
         </div>
       </section>

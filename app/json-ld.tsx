@@ -9,7 +9,7 @@ export function RestaurantJsonLd() {
     logo: "/assets/jahez/logo.jpg",
     servesCuisine: ["Egyptian", "Ready-to-cook", "Homestyle"],
     priceRange: "EGP",
-    areaServed: ["New Cairo", "Al Rehab"],
+    areaServed: ["Fifth Settlement", "New Cairo", "East Cairo"],
     hasMenu: "/menu",
   };
   return (

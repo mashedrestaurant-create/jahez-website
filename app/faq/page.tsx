@@ -28,9 +28,9 @@ const faqData = [
   {
     id: "delivery-areas",
     questionAr: "بتوصلوا لمناطق إيه؟",
-    answerAr: "التوصيل متاح حاليًا داخل التجمع والرحاب. المناطق ورسوم التوصيل بتظهر أثناء إتمام الطلب، وبتتحدد من لوحة التحكم.",
+    answerAr: "بنوصل من فرعنا في التجمع الخامس للمناطق حواليه حسب المسافة. حددي موقعك على الخريطة أثناء الطلب والنظام يحسب رسوم التوصيل تلقائيًا.",
     questionEn: "Which areas do you deliver to?",
-    answerEn: "Delivery is currently available in New Cairo and Al Rehab. Areas and delivery fees appear at checkout and are managed from the admin dashboard.",
+    answerEn: "We deliver from our branch in New Cairo (Fifth Settlement) to surrounding areas based on distance. Pick your location on the map at checkout and the fee is calculated automatically.",
   },
   {
     id: "minimum-order",

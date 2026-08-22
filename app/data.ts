@@ -1,7 +1,6 @@
 export type CategoryId =
   | "poultry"
   | "beef"
-  | "cooked-meals"
   | "ready-meals"
   | "appetizers";
 
@@ -43,14 +42,6 @@ export const categories: {
     image: "/assets/jahez/beef.jpg",
     note: "البيع بالكيلو الكامل — تجهيز يومي حسب الطلب",
     noteEn: "Sold by the full kilogram — prepared fresh for each order",
-  },
-  {
-    id: "cooked-meals",
-    label: "وجبات مطهية",
-    labelEn: "Cooked Meals",
-    image: "/assets/jahez/ready-meals.jpg",
-    note: "جاهزة للتسخين والتقديم",
-    noteEn: "Ready to heat and serve",
   },
   {
     id: "ready-meals",
@@ -255,7 +246,7 @@ export const products: Product[] = [
   },
   {
     id: "beef-bolognese",
-    category: "cooked-meals",
+    category: "beef",
     name: "صوص بولونيز باللحم",
     nameEn: "Beef Bolognese Sauce",
     description: "صوص بولونيز باللحم مطهي وجاهز للتسخين والتقديم مع المكرونة.",
@@ -372,7 +363,6 @@ export const products: Product[] = [
 export const productFallbacks: Record<CategoryId, string> = {
   poultry: "/assets/jahez/poultry.jpg",
   beef: "/assets/jahez/beef.jpg",
-  "cooked-meals": "/assets/jahez/ready-meals.jpg",
   "ready-meals": "/assets/jahez/ready-meals.jpg",
   appetizers: "/assets/jahez/appetizers.jpg",
 };
