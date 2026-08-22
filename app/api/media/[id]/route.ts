@@ -34,23 +34,35 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     if (!media) return new Response("Not found", { status: 404 });
 
     const rawData: unknown = media.data;
+    let buf = toBinary(rawData);
+    if (!buf || buf.length === 0) return new Response("Not found", { status: 404 });
 
-    // Detect base64 double-encoding: raw column arrived as a pure base64 string
-    const looksLikeBase64Text =
-      typeof rawData === "string" &&
-      /^[A-Za-z0-9+/=\r\n]+$/.test((rawData as string).slice(0, 512));
+    // Sniff real image magic numbers. If absent but content looks like base64
+    // text (Neon adapter can return BYTEA that way), decode and re-check.
+    const isBinaryImage =
+      (buf.length > 12 && buf.subarray(0, 4).toString("latin1") === "RIFF" && buf.subarray(8, 12).toString("latin1") === "WEBP") ||
+      (buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8) || // jpeg
+      (buf.length > 8 && buf[0] === 0x89 && buf[1] === 0x50); // png
 
-    let body: Uint8Array;
-    if (looksLikeBase64Text) {
-      body = new Uint8Array(Buffer.from(rawData as string, "base64"));
-    } else {
-      const buf = toBinary(rawData);
-      if (!buf || buf.length === 0) return new Response("Not found", { status: 404 });
-      body = new Uint8Array(buf);
+    if (!isBinaryImage) {
+      const head = buf.subarray(0, 512).toString("latin1");
+      const looksLikeBase64 = /^[A-Za-z0-9+/=\r\n]+$/.test(head);
+      if (looksLikeBase64) {
+        try {
+          const decoded = Buffer.from(buf.toString("latin1"), "base64");
+          const dOk =
+            decoded.length > 12 &&
+            ((decoded.subarray(0, 4).toString("latin1") === "RIFF" && decoded.subarray(8, 12).toString("latin1") === "WEBP") ||
+              (decoded[0] === 0xff && decoded[1] === 0xd8) ||
+              (decoded[0] === 0x89 && decoded[1] === 0x50));
+          if (dOk) buf = decoded;
+        } catch {
+          // keep original buffer
+        }
+      }
     }
 
-    if (body.byteLength === 0) return new Response("Not found", { status: 404 });
-
+    const body = new Uint8Array(buf);
     return new Response(body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer, {
       status: 200,
       headers: {
