@@ -27,6 +27,11 @@ export async function GET(request: NextRequest) {
     const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
     const end = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     where.createdAt = { gte: start, lt: end };
+  } else if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split("-").map(Number);
+    const start = new Date(y, m - 1, d);
+    const end = new Date(y, m - 1, d + 1);
+    where.createdAt = { gte: start, lt: end };
   }
   if (search) {
     where.OR = [
