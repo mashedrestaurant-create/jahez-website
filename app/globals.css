@@ -3277,6 +3277,52 @@ img {
   direction: ltr;
 }
 
+/* ─── Floating vertical social bar (like WhatsApp float) ─── */
+.floating-social {
+  position: fixed;
+  z-index: 90;
+  left: 24px;
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.floating-social-item {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.floating-social-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.3);
+}
+
+.floating-social-item svg {
+  width: 21px;
+  height: 21px;
+}
+
+.floating-social-item.instagram {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.floating-social-item.facebook {
+  background: #1877f2;
+}
+
+.floating-social-item.tiktok {
+  background: #161616;
+}
+
 .menu-item {
   min-height: 220px;
   display: grid;
@@ -4910,6 +4956,22 @@ img {
 
   .floating-whatsapp b {
     display: none;
+  }
+
+  .floating-social {
+    left: 14px;
+    bottom: max(20px, env(safe-area-inset-bottom, 20px));
+    gap: 8px;
+  }
+
+  .floating-social-item {
+    width: 40px;
+    height: 40px;
+  }
+
+  .floating-social-item svg {
+    width: 18px;
+    height: 18px;
   }
 
   .menu-item {
