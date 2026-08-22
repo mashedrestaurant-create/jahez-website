@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useCallback } from "react";
 
@@ -21,9 +21,9 @@ export function trackEvent(event: string, page?: string, meta?: Record<string, u
   const body = { event, page: page || window.location.pathname, meta, sessionId };
   if (navigator.sendBeacon) {
     const blob = new Blob([JSON.stringify(body)], { type: "application/json" });
-    navigator.sendBeacon("/api/events", blob);
+    navigator.sendBeacon("/api/signal", blob);
   } else {
-    fetch("/api/events", {
+    fetch("/api/signal", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),

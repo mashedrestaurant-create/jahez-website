@@ -1,4 +1,4 @@
-const BASE = process.argv[2] || "http://localhost:3000";
+﻿const BASE = process.argv[2] || "http://localhost:3000";
 let pass = 0, fail = 0;
 const failures = [];
 
@@ -60,7 +60,7 @@ async function main() {
 
   // Events endpoint persists
   try {
-    const res = await fetch(BASE + "/api/events", {
+    const res = await fetch(BASE + "/api/signal", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ event: "test_event", page: "/__test__", sessionId: "test-session-123" }),
@@ -73,7 +73,7 @@ async function main() {
 
   // Events rejects empty
   try {
-    const res = await fetch(BASE + "/api/events", {
+    const res = await fetch(BASE + "/api/signal", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ event: "" }),

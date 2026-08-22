@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -20,9 +20,9 @@ export function trackEvent(event: string, page?: string, meta?: Record<string, u
   const sessionId = getSessionId();
   const body = JSON.stringify({ event, page: page || window.location.pathname, meta, sessionId });
   if (navigator.sendBeacon) {
-    navigator.sendBeacon("/api/events", new Blob([body], { type: "application/json" }));
+    navigator.sendBeacon("/api/signal", new Blob([body], { type: "application/json" }));
   } else {
-    fetch("/api/events", {
+    fetch("/api/signal", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body,

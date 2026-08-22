@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Alexandria, Cairo } from "next/font/google";
 import { headers } from "next/headers";
-import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { SiteFrame } from "./site-frame";
@@ -95,7 +94,6 @@ export default async function RootLayout({
       <body>
         {isAdmin ? children : <SiteFrame>{children}</SiteFrame>}
         <EventTracker />
-        <Analytics />
         <SpeedInsights />
       </body>
     </html>
