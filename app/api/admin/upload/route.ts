@@ -8,10 +8,21 @@ const MAX_INPUT_BYTES = 25 * 1024 * 1024; // 25MB
 
 async function loadSharp() {
   try {
-    const mod = await import("sharp").catch(() => null);
-    return mod?.default ?? null;
-  } catch {
-    return null;
+    // createRequire bypasses bundler transforms entirely — resolves real node_modules at runtime
+    const { createRequire } = await import("module");
+    const req = createRequire(import.meta.url);
+    const mod = req("sharp");
+    return mod?.default ?? mod ?? null;
+  } catch (e: any) {
+    console.error("[upload] sharp load failed:", e?.message || e);
+    // Fallback: normal dynamic import
+    try {
+      const mod = await import("sharp");
+      return mod?.default ?? mod ?? null;
+    } catch (e2: any) {
+      console.error("[upload] sharp import fallback failed:", e2?.message || e2);
+      return null;
+    }
   }
 }
 

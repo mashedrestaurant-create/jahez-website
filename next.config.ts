@@ -18,6 +18,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["sharp"],
+  outputFileTracingIncludes: {
+    "/api/admin/upload": ["./node_modules/sharp/**", "./node_modules/@img/**"],
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
