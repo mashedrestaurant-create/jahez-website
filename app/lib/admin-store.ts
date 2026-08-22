@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 
-type Tab = "overview" | "analytics" | "orders" | "products" | "categories" | "locations" | "settings" | "payments" | "drivers";
+type Tab = "overview" | "analytics" | "orders" | "products" | "categories" | "locations" | "settings" | "payments" | "drivers" | "users";
 
 interface AdminState {
   admin: { id: string; username: string; name?: string; role: string } | null;

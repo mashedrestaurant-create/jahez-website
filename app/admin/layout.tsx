@@ -13,6 +13,7 @@ const TABS_AR: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
   { id: "locations", label: "الفروع", icon: "📍" },
   { id: "payments", label: "طرق الدفع", icon: "💳" },
   { id: "settings", label: "الإعدادات", icon: "⚙️" },
+  { id: "users", label: "المستخدمين", icon: "👥", roles: ["owner"] },
 ];
 
 const TABS_EN: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
@@ -25,6 +26,7 @@ const TABS_EN: { id: Tab; label: string; icon: string; roles?: string[] }[] = [
   { id: "locations", label: "Locations", icon: "📍" },
   { id: "payments", label: "Payments", icon: "💳" },
   { id: "settings", label: "Settings", icon: "⚙️" },
+  { id: "users", label: "Users", icon: "👥", roles: ["owner"] },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

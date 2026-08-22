@@ -9,6 +9,7 @@ import { LocationsTab } from "./tabs/locations";
 import { DriversTab } from "./tabs/drivers";
 import { PaymentsTab } from "./tabs/payments";
 import { SettingsTab } from "./tabs/settings";
+import { UsersTab } from "./tabs/users";
 
 const TAB_MAP: Record<string, React.FC> = {
   overview: OverviewTab,
@@ -20,6 +21,7 @@ const TAB_MAP: Record<string, React.FC> = {
   drivers: DriversTab,
   payments: PaymentsTab,
   settings: SettingsTab,
+  users: UsersTab,
 };
 
 export default function AdminPage() {
