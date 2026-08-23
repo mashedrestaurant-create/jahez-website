@@ -126,10 +126,27 @@ export function SettingsTab() {
       </Section>
 
       <Section title="الدفع">
-        <Field label="الدفع عند الاستلام" keyName="cashOnDeliveryEnabled" />
-        <Field label="انستاباي" keyName="instapayEnabled" />
-        <Field label="حساب الانستاباي" keyName="instapayAccount" />
-        <Field label="رابط الدفع" keyName="instapayPaymentLink" />
+        <div className="md:col-span-2">
+          <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>الدفع عند الاستلام</label>
+          <select value={settings.cashOnDeliveryEnabled || "false"} onChange={e => set("cashOnDeliveryEnabled", e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#c9a23b] focus:border-transparent">
+            <option value="true">مفعّل</option>
+            <option value="false">معطّل</option>
+          </select>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>إنستاباي / تحويل بنكي</label>
+          <select value={settings.instapayEnabled || "false"} onChange={e => set("instapayEnabled", e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#c9a23b] focus:border-transparent">
+            <option value="true">مفعّل</option>
+            <option value="false">معطّل</option>
+          </select>
+        </div>
+        <Field label="حساب الإنستاباي (اسم المستخدم)" keyName="instapayAccount" />
+        <Field label="رابط صفحة التحويل" keyName="instapayPaymentLink" />
+        <p style={{ gridColumn: "1 / -1", fontSize: 11, color: "#9ca3af", margin: 0 }}>
+          عند التفعيل، العميل هيختار "إنستاباي" كطريقة دفع، وبعد تأكيد الطلب هيزرار يفتح صفحة التحويل. حط رابط صفحة التحويل من إنستاباي.
+        </p>
       </Section>
 
       <BackupsSection />
