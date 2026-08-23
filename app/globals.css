@@ -7370,8 +7370,9 @@ body {
 .jahez-hero .hero-copy h1 {
   max-width: 640px;
   font-size: clamp(42px, 5.5vw, 78px);
-  line-height: 1.1;
+  line-height: 1.35;
   letter-spacing: -0.03em;
+  margin-bottom: 28px;
 }
 
 .jahez-hero .hero-copy h1 .gold {
@@ -7381,7 +7382,8 @@ body {
 .jahez-hero .hero-lead {
   max-width: 520px;
   font-size: clamp(15px, 1.4vw, 18px);
-  line-height: 1.85;
+  line-height: 1.9;
+  margin-bottom: 32px;
 }
 
 .jahez-hero-image {
