@@ -458,13 +458,13 @@ img {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  padding: 4px 0;
+  padding: 0;
 }
 
 .brand-ribbon-track {
   display: flex;
   gap: 34px;
-  padding: 17px 0;
+  padding: 12px 0;
   width: max-content;
   animation: ribbonScroll 25s linear infinite;
 }
@@ -3160,7 +3160,7 @@ img {
     gap: 22px;
     white-space: nowrap;
     justify-content: center;
-    padding: 12px 0;
+    padding: 10px 0;
   }
 
   .brand-ribbon i {
@@ -7365,7 +7365,7 @@ body {
   min-height: auto;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
-  padding-block: 64px 0;
+  padding-block: 64px 16px;
 }
 
 .jahez-hero .eyebrow,
@@ -7414,6 +7414,7 @@ body {
 .jahez-ribbon {
   background: var(--jahez-gold);
   color: var(--jahez-green);
+  margin-top: 4px;
 }
 
 .jahez-ribbon .brand-ribbon-track {
@@ -7434,6 +7435,7 @@ body {
   gap: 32px;
   margin-top: 40px;
   padding-top: 28px;
+  padding-bottom: 8px;
   border-top: 1px solid rgba(247, 240, 223, 0.15);
 }
 
@@ -8206,7 +8208,7 @@ body {
   .jahez-hero-grid {
     grid-template-columns: 1fr;
     gap: 32px;
-    padding-block: 48px 0;
+    padding-block: 48px 12px;
   }
 
   .jahez-hero .hero-copy {
