@@ -177,6 +177,7 @@ function Footer() {
             className="footer-logo-jahez"
           />
           <p className="footer-tagline">{t("footerTagline")}</p>
+          <div className="footer-brand-name">چاهِز</div>
           <SocialIcons />
           <p className="footer-copy">{t("footerCopy")}</p>
         </div>

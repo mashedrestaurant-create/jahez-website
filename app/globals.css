@@ -8139,6 +8139,16 @@ body {
   font-size: 15px;
 }
 
+.footer-brand-name {
+  font-family: var(--font-alexandria), var(--font-cairo), Tahoma, Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--jahez-gold);
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
 .jahez-footer .footer-copy {
   font-size: 14px;
   line-height: 1.8;
