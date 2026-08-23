@@ -458,6 +458,7 @@ img {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.06em;
+  padding: 4px 0;
 }
 
 .brand-ribbon-track {
@@ -3127,6 +3128,7 @@ img {
 
   .hero-lead {
     font-size: 15px;
+    text-align: center;
   }
 
   .hero-actions,
@@ -3158,6 +3160,11 @@ img {
     gap: 22px;
     white-space: nowrap;
     justify-content: center;
+    padding: 12px 0;
+  }
+
+  .brand-ribbon i {
+    font-size: 8px;
   }
 
   .section,
@@ -7424,7 +7431,7 @@ body {
 
 .hero-info-row {
   display: flex;
-  gap: 20px;
+  gap: 32px;
   margin-top: 40px;
   padding-top: 28px;
   border-top: 1px solid rgba(247, 240, 223, 0.15);
@@ -7432,8 +7439,8 @@ body {
 
 .hero-info-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
 }
 
 .hero-info-icon {
@@ -8213,6 +8220,16 @@ body {
   .hero-info-row {
     justify-content: center;
     flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .hero-info-item {
+    flex: 0 1 auto;
+    min-width: 140px;
+  }
+
+  .hero-actions {
+    justify-content: center;
   }
 
   .jahez-hero-visual {
@@ -8407,6 +8424,10 @@ body {
     gap: 14px;
   }
 
+  .hero-info-item {
+    justify-content: center;
+  }
+
   .hero-info-icon {
     width: 32px;
     height: 32px;
@@ -8418,6 +8439,15 @@ body {
 
   .hero-info-text span {
     font-size: 10px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .button {
+    width: 100%;
   }
 }
 
