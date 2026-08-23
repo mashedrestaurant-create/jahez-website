@@ -8423,24 +8423,41 @@ body {
 @media (max-width: 520px) {
   .hero-info-row {
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 18px;
   }
 
   .hero-info-item {
+    display: flex;
+    align-items: center;
     justify-content: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(201, 162, 59, 0.06);
+    border: 1px solid rgba(201, 162, 59, 0.15);
+    border-radius: 14px;
   }
 
   .hero-info-icon {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .hero-info-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
   }
 
   .hero-info-text strong {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .hero-info-text span {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .hero-actions {
