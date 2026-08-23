@@ -42,9 +42,9 @@ const faqData = [
   {
     id: "payment",
     questionAr: "إيه طرق الدفع المتاحة؟",
-    answerAr: "تقدري تدفعي كاش عند الاستلام، أو تحويل بنكي على حساب CIB банك (100076177176). بعدي الإيصال على الواتساب مع رقم الطلب وجاهز!",
+    answerAr: "تقدري تدفعي كاش عند الاستلام، أو عن طريق إنستاباي. بعد تأكيد الطلب هتلاقي زرار يدخلك على صفحة التحويل فيها كل التفاصيل — رقم الحساب والمبلغ واسم الشركة. بعدين ابعتي إثبات التحويل على الواتساب مع رقم الطلب.",
     questionEn: "What payment methods are available?",
-    answerEn: "You can pay cash on delivery, or via bank transfer to CIB Bank (100076177176). Send the receipt on WhatsApp with your order number and you're all set!",
+    answerEn: "You can pay cash on delivery, or via InstaPay. After confirming your order, you'll see a button that takes you to the transfer page with all details — account number, amount and company name. Then send the receipt on WhatsApp with your order number.",
   },
   {
     id: "pickup",
