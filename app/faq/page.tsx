@@ -42,9 +42,9 @@ const faqData = [
   {
     id: "payment",
     questionAr: "إيه طرق الدفع المتاحة؟",
-    answerAr: "تقدري تدفعي كاش عند الاستلام، أو عن طريق InstaPay على الحساب ayaelsherbine@instapay. بعدي الإيصال على الواتساب مع رقم الطلب وجاهز!",
+    answerAr: "تقدري تدفعي كاش عند الاستلام، أو تحويل بنكي على حساب CIB банك (100076177176). بعدي الإيصال على الواتساب مع رقم الطلب وجاهز!",
     questionEn: "What payment methods are available?",
-    answerEn: "You can pay cash on delivery, or via InstaPay to ayaelsherbine@instapay. Send the receipt on WhatsApp with your order number and you're all set!",
+    answerEn: "You can pay cash on delivery, or via bank transfer to CIB Bank (100076177176). Send the receipt on WhatsApp with your order number and you're all set!",
   },
   {
     id: "pickup",

@@ -2292,6 +2292,59 @@ img {
   cursor: pointer;
 }
 
+.instapay-bank-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  background: var(--cream-soft);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.bank-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.bank-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.bank-label {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.bank-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--teal);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.copy-btn {
+  padding: 4px 10px;
+  color: var(--cream);
+  background: var(--teal);
+  border: 0;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.copy-btn:hover {
+  opacity: 0.85;
+}
+
 .payment-result-page {
   min-height: 72vh;
   display: grid;
