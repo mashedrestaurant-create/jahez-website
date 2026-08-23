@@ -7,9 +7,9 @@ const faqData = [
   {
     id: "ready-to-cook",
     questionAr: "المنتجات جاهزة للأكل ولا محتاجة تسوية؟",
-    answerAr: "ده بيختلف حسب الصنف. بعض المنتجات جاهزة للتسوية، وبعض الوجبات جاهزة أو مطهية. تفاصيل كل منتج وطريقة التعامل معاه بتكون مكتوبة داخل صفحة الصنف.",
+    answerAr: "كل منتجاتنا بتيجي نيئة (نيئة تمامًا) وبتوصل جاهزة للتسوية. التعليمات والتفاصيل مكتوبة على الاستيكر الخاص بكل منتج.",
     questionEn: "Are the products ready to eat or do they need cooking?",
-    answerEn: "It depends on the product. Some items are ready to cook, while others are pre-cooked or ready to serve. Details and preparation instructions are listed on each product page.",
+    answerEn: "All our products come raw and are ready to be cooked. Preparation instructions and details are printed on each product's sticker.",
   },
   {
     id: "advance-order",
