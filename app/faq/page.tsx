@@ -42,9 +42,9 @@ const faqData = [
   {
     id: "payment",
     questionAr: "إيه طرق الدفع المتاحة؟",
-    answerAr: "الدفع كاش هو المتاح حاليًا. طرق الدفع الأخرى مثل InstaPay والدفع بالبطاقة هتظهر تلقائيًا لما يتم تفعيلها من إدارة الموقع.",
+    answerAr: "تقدري تدفعي كاش عند الاستلام، أو عن طريق InstaPay على الحساب ayaelsherbine@instapay. بعدي الإيصال على الواتساب مع رقم الطلب وجاهز!",
     questionEn: "What payment methods are available?",
-    answerEn: "Cash on delivery is currently available. Other payment methods like InstaPay and card payment will appear automatically once enabled from the admin dashboard.",
+    answerEn: "You can pay cash on delivery, or via InstaPay to ayaelsherbine@instapay. Send the receipt on WhatsApp with your order number and you're all set!",
   },
   {
     id: "pickup",

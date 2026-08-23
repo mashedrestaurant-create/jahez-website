@@ -94,9 +94,9 @@ export const defaultSettings: SiteSettings = {
   freeDeliveryThreshold: "0",
   orderLeadHours: "24",
   cashOnDeliveryEnabled: "true",
-  instapayEnabled: "false",
-  instapayAccount: "",
-  instapayPaymentLink: "",
+  instapayEnabled: "true",
+  instapayAccount: "ayaelsherbine@instapay",
+  instapayPaymentLink: "https://ipn.eg/S/ayaelsherbine/instapay/7nGWx1",
   paymobEnabled: "false",
   taglineAr:
     "أكل البيت من غير وقت التحضير — منتجات ووجبات مجهزة بعناية، تطلبيها قبلها بـ24 ساعة.",
