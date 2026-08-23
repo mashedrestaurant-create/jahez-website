@@ -634,7 +634,7 @@ export default function CartPage() {
                     rel="noreferrer"
                     onClick={clear}
                   >
-                    {isArabic ? "ابعت إثبات التحويل على الواتساب" : "Send transfer receipt on WhatsApp"}
+                    {isArabic ? "ابعت إثبات التحويل وتأكيد الأوردر على الواتساب" : "Send transfer receipt & order confirmation on WhatsApp"}
                   </a>
                 </section>
               ) : (
