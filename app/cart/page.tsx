@@ -43,6 +43,7 @@ export default function CartPage() {
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
   const [failedOrderId, setFailedOrderId] = useState<number | null>(null);
+  const [copiedAccount, setCopiedAccount] = useState(false);
   const [instapayConfirmation, setInstapayConfirmation] = useState<{
     orderId: number;
     total: number;
@@ -592,23 +593,40 @@ export default function CartPage() {
                   </h2>
                   <p>
                     {isArabic
-                      ? "ادوسي على زرار إنستاباي وهتلاقي كل تفاصيل التحويل: رقم الحساب والمبلغ واسم الشركة. بعدين ابعتي إثبات التحويل على الواتساب مع رقم الطلب."
-                      : "Click the InstaPay button below to see all transfer details: account number, amount and company name. Then send the receipt on WhatsApp with your order number."}
+                      ? "حولي المبلغ لحسابنا عن طريق إنستاباي، وبعدين ابعتي إثبات التحويل على الواتساب مع رقم الطلب."
+                      : "Transfer the amount to our InstaPay account below, then send the receipt on WhatsApp with your order number."}
                   </p>
                   <div className="instapay-total">
                     <span>{isArabic ? "المبلغ المطلوب" : "Amount due"}</span>
                     <b>{formatPrice(instapayConfirmation.total)}</b>
                   </div>
-                  {instapayConfirmation.paymentLink && (
-                    <a
-                      className="button button-primary"
-                      href={instapayConfirmation.paymentLink}
-                      target="_blank"
-                      rel="noreferrer"
+                  <div className="instapay-bank-details">
+                    <div className="bank-row">
+                      <span className="bank-label">{isArabic ? "البنك" : "Bank"}</span>
+                      <span className="bank-value">CIB Bank</span>
+                    </div>
+                    <div className="bank-row">
+                      <span className="bank-label">{isArabic ? "رقم الحساب" : "Account number"}</span>
+                      <span className="bank-value bank-number">100076177176</span>
+                    </div>
+                    <div className="bank-row">
+                      <span className="bank-label">{isArabic ? "اسم صاحب الحساب" : "Account holder"}</span>
+                      <span className="bank-value">SweetBite co</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="bank-copy-btn"
+                      onClick={() => {
+                        navigator.clipboard.writeText("100076177176");
+                        setCopiedAccount(true);
+                        setTimeout(() => setCopiedAccount(false), 2000);
+                      }}
                     >
-                      {isArabic ? "افتح إنستاباي للتحويل" : "Open InstaPay"}
-                    </a>
-                  )}
+                      {copiedAccount
+                        ? (isArabic ? "تم النسخ ✓" : "Copied ✓")
+                        : (isArabic ? "نسخ رقم الحساب" : "Copy account number")}
+                    </button>
+                  </div>
                   <a
                     className="button whatsapp-submit"
                     href={settings.whatsappNumber.trim() ? `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(instapayConfirmation.message)}` : "/contact"}
@@ -616,7 +634,7 @@ export default function CartPage() {
                     rel="noreferrer"
                     onClick={clear}
                   >
-                    {isArabic ? "ابعت إثبات التحويل" : "Send transfer receipt"}
+                    {isArabic ? "ابعت إثبات التحويل على الواتساب" : "Send transfer receipt on WhatsApp"}
                   </a>
                 </section>
               ) : (
