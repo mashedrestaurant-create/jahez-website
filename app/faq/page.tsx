@@ -7,9 +7,9 @@ const faqData = [
   {
     id: "ready-to-cook",
     questionAr: "المنتجات جاهزة للأكل ولا محتاجة تسوية؟",
-    answerAr: "كل منتجاتنا بتيجي نيئة (نيئة تمامًا) وبتوصل جاهزة للتسوية. التعليمات والتفاصيل مكتوبة على الاستيكر الخاص بكل منتج.",
+    answerAr: "كل منتجاتنا بتوصلك جاهزة للتسوية — محتاجة بس تتبعي التعليمات المكتوبة على الاستيكر وهي جاهزة!",
     questionEn: "Are the products ready to eat or do they need cooking?",
-    answerEn: "All our products come raw and are ready to be cooked. Preparation instructions and details are printed on each product's sticker.",
+    answerEn: "All our products arrive ready for you to cook. Simply follow the instructions printed on the product sticker and you're good to go!",
   },
   {
     id: "advance-order",
