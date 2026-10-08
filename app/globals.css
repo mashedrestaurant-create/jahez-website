@@ -48,6 +48,13 @@ button {
   color: inherit;
 }
 
+/* Unlayered author CSS beats Tailwind v4 layered utilities, so `button{color:inherit}`
+   was overriding `.text-white` on dark buttons (white text rendered dark/illegible).
+   This restores white text on any button explicitly marked text-white. */
+button.text-white {
+  color: #fff;
+}
+
 img {
   object-fit: cover;
 }
