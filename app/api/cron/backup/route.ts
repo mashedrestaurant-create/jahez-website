@@ -4,6 +4,8 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const KEEP_LAST = 30;
+// Analytics/session hygiene: keep 90 days of events, drop expired logins.
+const EVENT_RETENTION_DAYS = 90;
 
 async function buildSnapshot() {
   const [
@@ -78,7 +80,18 @@ export async function GET(request: Request) {
       }
     }
 
-    return Response.json({ ok: true, sizeBytes, counts, kept: Math.min(all.length + 1, KEEP_LAST) });
+    // Bound table growth: prune old analytics events + expired login sessions.
+    const cutoff = new Date(Date.now() - EVENT_RETENTION_DAYS * 24 * 60 * 60 * 1000);
+    const [prunedEvents, prunedAdminSessions, prunedDriverSessions] = await Promise.all([
+      prisma.siteEvent.deleteMany({ where: { createdAt: { lt: cutoff } } }).catch(() => ({ count: 0 })),
+      prisma.adminSession.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => ({ count: 0 })),
+      prisma.driverSession.deleteMany({ where: { expiresAt: { lt: new Date() } } }).catch(() => ({ count: 0 })),
+    ]);
+
+    return Response.json({
+      ok: true, sizeBytes, counts, kept: Math.min(all.length + 1, KEEP_LAST),
+      pruned: { events: prunedEvents.count, adminSessions: prunedAdminSessions.count, driverSessions: prunedDriverSessions.count },
+    });
   } catch {
     return Response.json({ ok: false }, { status: 500 });
   }

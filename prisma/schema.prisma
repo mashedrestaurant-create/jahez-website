@@ -34,6 +34,8 @@ model AdminSession {
   createdAt DateTime @default(now())
 
   admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
 }
 
 // ─── 3. Customer ─────────────────────────────────────
@@ -107,6 +109,9 @@ model Product {
   addOns       ProductAddOn[]
   optionGroups ProductOptionGroup[]
   orderItems   OrderItem[]
+
+  @@index([categoryId])
+  @@index([active])
 }
 
 // ─── 6. AddOn ────────────────────────────────────────
@@ -377,6 +382,10 @@ model Order {
   items           OrderItem[]
   statusHistory   OrderStatusHistory[]
   paymentAttempts PaymentAttempt[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([customerPhone])
 }
 
 // ─── 19. OrderItem ───────────────────────────────────
@@ -396,6 +405,8 @@ model OrderItem {
 
   order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product?  @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
 }
 
 // ─── 20. OrderStatusHistory ──────────────────────────
@@ -409,6 +420,8 @@ model OrderStatusHistory {
 
   order   Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
   admin   AdminUser? @relation(fields: [changedBy], references: [id])
+
+  @@index([orderId])
 }
 
 // ─── 21. PaymentAttempt ──────────────────────────────
@@ -428,6 +441,8 @@ model PaymentAttempt {
 
   order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
   paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+
+  @@index([orderId])
 }
 
 // ─── 22. Driver ──────────────────────────────────────
@@ -460,6 +475,8 @@ model DriverSession {
   createdAt DateTime @default(now())
 
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
 }
 
 // ─── 24. MediaAsset ──────────────────────────────────
