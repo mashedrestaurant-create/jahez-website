@@ -101,14 +101,30 @@ export function CategoriesTab() {
     setTimeout(() => setNotice(""), 3000);
   };
 
-  const startEdit = (c: Category) => {
-    setForm({
+  const startEdit = (c: Category) => {    setForm({
       id: c.id, nameAr: c.nameAr || "", nameEn: c.nameEn || "", slug: c.slug || "",
       descriptionAr: c.descriptionAr || "", descriptionEn: c.descriptionEn || "",
       imageId: c.imageId || "", videoUrl: c.videoUrl || "",
       icon: c.icon || "", sortOrder: String(c.sortOrder ?? 0), active: c.active !== false,
     });
     setShowModal(true);
+  };
+
+  const handleDelete = async (c: Category) => {
+    if (!window.confirm(`حذف قسم "${c.nameAr || c.nameEn}" نهائياً؟`)) return;
+    try {
+      const res = await fetch(`/api/admin/categories?id=${encodeURIComponent(c.id)}`, { method: "DELETE" });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok !== false) {
+        setNotice("تم حذف القسم");
+        fetchCategories();
+      } else {
+        setNotice(d.error || "تعذر الحذف");
+      }
+    } catch {
+      setNotice("تعذر الحذف");
+    }
+    setTimeout(() => setNotice(""), 4000);
   };
 
   return (
@@ -240,6 +256,9 @@ export function CategoriesTab() {
                 {c.descriptionAr && <p className="text-xs" style={{ color: "#6b7280" }}>{c.descriptionAr}</p>}
                 <button onClick={() => startEdit(c)} className="rounded-lg px-3 py-1.5 text-xs font-bold transition-colors hover:bg-gray-100" style={{ color: "#c9a23b" }}>
                   تعديل
+                </button>
+                <button onClick={() => handleDelete(c)} className="rounded-lg px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-50" style={{ color: "#dc2626" }}>
+                  حذف
                 </button>
               </div>
             </div>

@@ -91,7 +91,7 @@ export default function HomePage() {
           <div className="hero-visual jahez-hero-visual">
             <div className="hero-image-shell jahez-hero-image">
               <Image
-                src="/assets/jahez/hero-chicken.jpg"
+                src={settings.heroImageUrl?.trim() || "/assets/jahez/hero-chicken.jpg"}
                 alt={isArabic ? "دجاج فاهيتا مجهز من چاهِز" : "Prepared chicken fajita from Jahez"}
                 fill
                 priority

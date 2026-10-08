@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { PlainImage as Image } from "../plain-image";
+import { useCatalog } from "../catalog-context";
 import { useLanguage } from "../language-context";
 
 export default function AboutPage() {
   const { isArabic, t } = useLanguage();
+  const { settings } = useCatalog();
+  const storySrc = settings.storyImageUrl?.trim() || "/assets/jahez/fajita-packaging.jpg";
 
   return (
     <>
@@ -47,7 +50,7 @@ export default function AboutPage() {
           <div className="jahez-story-hero-visual">
             <div className="jahez-story-hero-image">
               <Image
-                src="/assets/jahez/fajita-packaging.jpg"
+                src={storySrc}
                 alt={
                   isArabic
                     ? "عبوة فاهيتا دجاج چاهِز"

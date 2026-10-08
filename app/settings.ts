@@ -67,6 +67,8 @@ export type SiteSettings = {
   taglineEn: string;
   heroTitleAr: string;
   heroTitleEn: string;
+  heroImageUrl: string;
+  storyImageUrl: string;
   offers: string;
   journeyCities: string;
   openTime: string;
@@ -104,6 +106,8 @@ export const defaultSettings: SiteSettings = {
     "Homestyle meals without the prep time — carefully prepared products ordered 24 hours ahead.",
   heroTitleAr: "طعم البيت… من غير وقت التحضير",
   heroTitleEn: "Homestyle Taste, Without the Prep Time",
+  heroImageUrl: "/assets/jahez/hero-chicken.jpg",
+  storyImageUrl: "/assets/jahez/fajita-packaging.jpg",
   offers: "[]",
   journeyCities: "[]",
   openTime: "09:00",

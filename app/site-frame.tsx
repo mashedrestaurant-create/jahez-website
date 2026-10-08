@@ -28,18 +28,12 @@ function Header() {
         <div className="header-inner">
           <Link
             href="/"
-            className="brand-link jahez-brand-link"
+            className="brand-link jahez-brand-link jahez-brand-text"
             aria-label="Jahez home"
             onClick={() => setOpen(false)}
           >
-            <Image
-              src="/assets/jahez/logo.jpg"
-              alt="چاهِز Jahez"
-              width={130}
-              height={130}
-              priority
-              className="brand-wordmark jahez-wordmark"
-            />
+            <span className="jahez-brand-ar">چاهِز</span>
+            <span className="jahez-brand-en">JAHEZ</span>
           </Link>
           <nav className="desktop-nav" aria-label={t("ariaLabelNav")}>
             {nav.map((item) => (

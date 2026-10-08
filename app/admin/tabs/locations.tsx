@@ -135,6 +135,23 @@ export function LocationsTab() {
     setShowModal(true);
   };
 
+  const handleDelete = async (loc: Location) => {
+    if (!window.confirm(`حذف فرع "${loc.nameAr || loc.nameEn}" نهائياً؟`)) return;
+    try {
+      const res = await fetch(`/api/admin/locations?id=${encodeURIComponent(loc.id)}`, { method: "DELETE" });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok !== false) {
+        setNotice("تم حذف الفرع");
+        fetchLocations();
+      } else {
+        setNotice(d.error || "تعذر الحذف");
+      }
+    } catch {
+      setNotice("تعذر الحذف");
+    }
+    setTimeout(() => setNotice(""), 4000);
+  };
+
   const mapsLink = (loc: Location) => {
     if (loc.googleMapsUrl) return loc.googleMapsUrl;
     if (loc.latitude && loc.longitude) return `https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`;
@@ -276,6 +293,9 @@ export function LocationsTab() {
                     )}
                     <button onClick={() => startEdit(loc)} className="rounded-lg px-3 py-1.5 text-xs font-bold transition-colors hover:bg-gray-100" style={{ color: "#c9a23b" }}>
                       تعديل
+                    </button>
+                    <button onClick={() => handleDelete(loc)} className="rounded-lg px-3 py-1.5 text-xs font-bold transition-colors hover:bg-red-50" style={{ color: "#dc2626" }}>
+                      حذف
                     </button>
                   </div>
                 </div>

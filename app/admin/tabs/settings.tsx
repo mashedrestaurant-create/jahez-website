@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { ImageUploader } from "../components/image-uploader";
 
 export function SettingsTab() {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -70,20 +71,18 @@ export function SettingsTab() {
         </div>
       </div>
 
-      <Section title="معلومات التواصل">
-        <Field label="الهاتف" keyName="phone" />
-        <Field label="البريد الإلكتروني" keyName="email" />
-        <Field label="واتساب" keyName="whatsapp" />
-        <Field label="رقم واتساب" keyName="whatsappNumber" />
-        <Field label="العنوان" keyName="address" span />
+      <Section title="معلومات التواصل — تظهر في الموقع فوراً">
+        <div className="md:col-span-2">
+          <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>رقم الواتساب الرئيسي *</label>
+          <input dir="ltr" value={settings.whatsappNumber || ""} onChange={e => set("whatsappNumber", e.target.value)}
+            placeholder="+201XXXXXXXXX"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#c9a23b] focus:border-transparent" />
+          <p className="mt-1 text-[11px]" style={{ color: "#9ca3af" }}>ده الرقم اللي بيظهر في الموقع والسلة والفوتر وبيستقبل تأكيدات الطلبات وإثباتات التحويل.</p>
+        </div>
+        <Field label="لينك جوجل مابس" keyName="mapsUrl" span />
+        <Field label="عنوان الاستلام (عربي)" keyName="pickupAddressAr" span />
+        <Field label="عنوان الاستلام (إنجليزي)" keyName="pickupAddressEn" span />
       </Section>
-
-      <Section title="البرانديング">
-        <Field label="اسم الموقع (عربي)" keyName="siteNameAr" />
-        <Field label="اسم الموقع (إنجليزي)" keyName="siteNameEn" />
-        <Field label="الشعار (رابط صورة)" keyName="logo" span />
-      </Section>
-
 
       <Section title="السوشيال ميديا">
         <Field label="إنستجرام" keyName="socialInstagram" span />
@@ -91,11 +90,15 @@ export function SettingsTab() {
         <Field label="تيك توك" keyName="socialTiktok" span />
       </Section>
 
-      <Section title="الهيرو — الصفحة الرئيسية">
-        <Field label="العنوان الرئيسي (عربي)" keyName="heroTitleAr" />
-        <Field label="العنوان الرئيسي (إنجليزي)" keyName="heroTitleEn" />
-        <Field label="نص الوصف (عربي)" keyName="heroSubtitleAr" />
-        <Field label="نص الوصف (إنجليزي)" keyName="heroSubtitleEn" />
+      <Section title="صور الصفحات — الهيرو">
+        <div className="md:col-span-2">
+          <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>صورة الهيرو — الصفحة الرئيسية (Home)</label>
+          <ImageUploader value={settings.heroImageUrl || ""} onChange={(url) => set("heroImageUrl", url)} height={120} />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-xs mb-1" style={{ color: "#6b7280" }}>صورة صفحة قصتنا (Our Story)</label>
+          <ImageUploader value={settings.storyImageUrl || ""} onChange={(url) => set("storyImageUrl", url)} height={120} />
+        </div>
       </Section>
 
       <Section title="الشعار التسويقي">
