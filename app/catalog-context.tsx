@@ -28,7 +28,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/catalog")
+    fetch("/api/catalog", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((payload) => {
         if (!active || !payload) return;

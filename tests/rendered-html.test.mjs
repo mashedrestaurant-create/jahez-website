@@ -15,10 +15,9 @@ const managedProducts = products.map((product) => ({ ...product, active: true })
 test("catalog includes the 26 products from the supplied Jahez menu", () => {
   assert.equal(products.length, 26);
   assert.equal(new Set(products.map((product) => product.id)).size, 26);
-  assert.equal(categories.length, 5);
+  assert.deepEqual(new Set(categories.map((c) => c.id)), new Set(["poultry", "beef", "ready-meals", "appetizers"]));
   assert.equal(products.filter((product) => product.category === "poultry").length, 8);
-  assert.equal(products.filter((product) => product.category === "beef").length, 8);
-  assert.equal(products.filter((product) => product.category === "cooked-meals").length, 1);
+  assert.equal(products.filter((product) => product.category === "beef").length, 9);
   assert.equal(products.filter((product) => product.category === "ready-meals").length, 4);
   assert.equal(products.filter((product) => product.category === "appetizers").length, 5);
 });
@@ -85,12 +84,11 @@ test("default commerce settings match the requested launch rules", () => {
   assert.equal(defaultSettings.orderLeadHours, "24");
   assert.equal(defaultSettings.minimumOrder, "0");
   assert.equal(defaultSettings.cashOnDeliveryEnabled, "true");
-  assert.equal(defaultSettings.instapayEnabled, "false");
+  assert.equal(defaultSettings.instapayEnabled, "true");
   assert.equal(defaultSettings.paymobEnabled, "false");
-  assert.equal(defaultSettings.whatsappNumber, "");
-  const zones = JSON.parse(defaultSettings.deliveryZones);
-  assert.deepEqual(zones.map((zone) => zone.id), ["new-cairo", "rehab"]);
-  assert.ok(zones.every((zone) => zone.minimumOrder === 0));
+  assert.equal(defaultSettings.whatsappNumber, "+201577793871");
+  // Delivery is distance-based from the store location (no fixed zones).
+  assert.deepEqual(JSON.parse(defaultSettings.deliveryZones), []);
 });
 
 test("catalog image references resolve to local files", async () => {
