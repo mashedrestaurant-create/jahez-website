@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { CartProvider, useCart } from "./cart-context";
 import { CatalogProvider, useCatalog, type CategoryMedia } from "./catalog-context";
-import { LanguageProvider, useLanguage } from "./language-context";
+import { LanguageProvider, useLanguage, type Language } from "./language-context";
 import { PlainImage as Image } from "./plain-image";
 import type { Product } from "./data";
 import type { SiteSettings } from "./settings";
@@ -225,17 +225,19 @@ function CartToast() {
 
 export function SiteFrame({
   children,
+  initialLanguage,
   initialProducts,
   initialSettings,
   initialCategoryMedia,
 }: {
   children: ReactNode;
+  initialLanguage?: Language;
   initialProducts?: Product[];
   initialSettings?: SiteSettings;
   initialCategoryMedia?: CategoryMedia;
 }) {
   return (
-    <LanguageProvider>
+    <LanguageProvider initialLanguage={initialLanguage}>
       <CatalogProvider
         initialProducts={initialProducts}
         initialSettings={initialSettings}

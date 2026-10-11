@@ -128,15 +128,24 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("ar");
+export function LanguageProvider({
+  children,
+  initialLanguage,
+}: {
+  children: ReactNode;
+  initialLanguage?: Language;
+}) {
+  const [language, setLanguage] = useState<Language>(initialLanguage ?? "ar");
 
   useEffect(() => {
+    // When the server already rendered the stored choice (cookie present),
+    // there is nothing to restore — this avoids the Arabic→English flash.
+    if (initialLanguage) return;
     const stored = window.localStorage.getItem("jahez-language");
     if (stored === "ar" || stored === "en") {
       queueMicrotask(() => setLanguage(stored));
     }
-  }, []);
+  }, [initialLanguage]);
 
   useEffect(() => {
     document.documentElement.lang = language;

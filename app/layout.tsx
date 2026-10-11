@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Alexandria, Cairo } from "next/font/google";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { SiteFrame } from "./site-frame";
 import { EventTracker } from "./event-tracker";
 import { RestaurantJsonLd, WebsiteJsonLd } from "./json-ld";
 import { loadCatalogPayload } from "./server-catalog";
+import type { Language } from "./language-context";
 
 // The site reads live catalog/settings from the database, so every request
 // must render fresh. Without this, the pages would be baked at build time and
@@ -90,6 +91,14 @@ export default async function RootLayout({
   const host = (hdrs.get("host") || "").split(":")[0];
   const isAdmin = host.startsWith("admin.");
 
+  // Language is stored in a cookie by the language provider. Read it here so
+  // the server renders the correct direction + language from the first paint,
+  // instead of always rendering Arabic and flipping to English after hydration.
+  const cookieStore = await cookies();
+  const langCookie = cookieStore.get("jahez-language")?.value;
+  const initialLanguage: Language | undefined =
+    langCookie === "en" ? "en" : langCookie === "ar" ? "ar" : undefined;
+
   // Server-render the real catalog so the first paint already shows the saved
   // images/products/settings. Previously the client rendered defaults, then
   // replaced them after fetching /api/catalog — which caused old images to
@@ -99,7 +108,11 @@ export default async function RootLayout({
     : await loadCatalogPayload().catch(() => null);
 
   return (
-    <html lang="ar" dir="rtl" className={`${alexandria.variable} ${cairo.variable}`}>
+    <html
+      lang={initialLanguage === "en" ? "en" : "ar"}
+      dir={initialLanguage === "en" ? "ltr" : "rtl"}
+      className={`${alexandria.variable} ${cairo.variable}`}
+    >
       <head>
         <meta name="theme-color" content="#0A2D1D" />
         <RestaurantJsonLd />
@@ -110,6 +123,7 @@ export default async function RootLayout({
           children
         ) : (
           <SiteFrame
+            initialLanguage={initialLanguage}
             initialSettings={catalog?.settings}
             initialProducts={catalog?.products}
             initialCategoryMedia={catalog?.categoryMedia}
