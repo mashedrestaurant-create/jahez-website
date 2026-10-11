@@ -237,7 +237,7 @@ export default function HomePage() {
             </Link>
           </div>
           <Image
-            src="/assets/jahez/fajita-packaging.jpg"
+            src={settings.storyImageUrl?.trim() || "/assets/jahez/fajita-packaging.jpg"}
             alt={isArabic ? "عبوة فاهيتا دجاج چاهِز" : "Jahez chicken fajita packaging"}
             width={853}
             height={1280}

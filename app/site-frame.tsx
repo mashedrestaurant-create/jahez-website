@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { CartProvider, useCart } from "./cart-context";
-import { CatalogProvider, useCatalog } from "./catalog-context";
+import { CatalogProvider, useCatalog, type CategoryMedia } from "./catalog-context";
 import { LanguageProvider, useLanguage } from "./language-context";
 import { PlainImage as Image } from "./plain-image";
+import type { Product } from "./data";
+import type { SiteSettings } from "./settings";
 
 function Header() {
   const pathname = usePathname();
@@ -221,10 +223,24 @@ function CartToast() {
   );
 }
 
-export function SiteFrame({ children }: { children: ReactNode }) {
+export function SiteFrame({
+  children,
+  initialProducts,
+  initialSettings,
+  initialCategoryMedia,
+}: {
+  children: ReactNode;
+  initialProducts?: Product[];
+  initialSettings?: SiteSettings;
+  initialCategoryMedia?: CategoryMedia;
+}) {
   return (
     <LanguageProvider>
-      <CatalogProvider>
+      <CatalogProvider
+        initialProducts={initialProducts}
+        initialSettings={initialSettings}
+        initialCategoryMedia={initialCategoryMedia}
+      >
         <CartProvider>
           <SiteChrome>{children}</SiteChrome>
         </CartProvider>

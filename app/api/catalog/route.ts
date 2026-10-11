@@ -1,38 +1,18 @@
-import { getPaymobConfig } from "../../paymob";
-import { loadManagedProducts, loadCategoryMedia } from "../../server-catalog";
+import { loadCatalogPayload } from "../../server-catalog";
 import { products as defaultProducts } from "../../data";
 import { defaultSettings } from "../../settings";
-import { loadSiteSettings } from "../../server-settings";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const [settings, products, paymobConfig, categoryMedia] = await Promise.all([
-      loadSiteSettings(),
-      loadManagedProducts(),
-      getPaymobConfig(),
-      loadCategoryMedia(),
-    ]);
-    return Response.json(
-      {
-        settings: {
-          ...settings,
-          paymobEnabled:
-            settings.paymobEnabled === "true" && paymobConfig
-              ? "true"
-              : "false",
-        },
-        products,
-        categoryMedia,
-      },
-      {
-        headers: {
-          "cache-control":
-            "public, max-age=60, s-maxage=60, stale-while-revalidate=300",
-        },
-      },
-    );
+    const payload = await loadCatalogPayload();
+    // no-store: the client refetches this after hydration to pick up dashboard
+    // edits instantly. Any CDN/browser caching here could serve an older copy
+    // that overwrites fresh server-rendered data (old image flashing back).
+    return Response.json(payload, {
+      headers: { "cache-control": "no-store" },
+    });
   } catch {
     return Response.json(
       {
@@ -40,12 +20,7 @@ export async function GET() {
         products: defaultProducts,
         categoryMedia: {},
       },
-      {
-        headers: {
-          "cache-control":
-            "public, max-age=30, s-maxage=30, stale-while-revalidate=300",
-        },
-      },
+      { headers: { "cache-control": "no-store" } },
     );
   }
 }

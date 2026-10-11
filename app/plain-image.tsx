@@ -4,7 +4,11 @@
 
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
 
-const GENERAL_FALLBACK = "/assets/jahez/hero-chicken.jpg";
+const GENERAL_FALLBACK =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="#F7F0DF"/><text x="400" y="308" font-family="Arial,Helvetica,sans-serif" font-size="54" font-weight="700" letter-spacing="6" fill="#0A2D1D" text-anchor="middle" dominant-baseline="middle">JAHEZ</text></svg>',
+  );
 // Transient media failures (slow DB/CDN cold start) get this many silent retries
 // against the ORIGINAL url before any fallback is shown.
 const MAX_RETRIES = 2;

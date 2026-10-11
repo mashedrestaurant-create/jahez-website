@@ -5,6 +5,9 @@ import {
   type CategoryId,
   type Product,
 } from "./data";
+import { getPaymobConfig } from "./paymob";
+import type { SiteSettings } from "./settings";
+import { loadSiteSettings } from "./server-settings";
 
 export type ManagedProduct = Product & {
   active: boolean;
@@ -108,5 +111,40 @@ export function serializeManagedProduct(product: ManagedProduct) {
     featured: product.featured === true,
     spicy: product.spicy === true,
     custom: product.custom === true,
+  };
+}
+
+export type CatalogPayload = {
+  settings: SiteSettings;
+  products: ManagedProduct[];
+  categoryMedia: Record<string, CategoryMedia>;
+};
+
+/**
+ * Single source of truth for the full catalog payload.
+ * Used both by GET /api/catalog and by the root layout for server-side
+ * rendering, so the first paint already contains the real data (no flash
+ * of default/old images before the client fetch resolves).
+ */
+export async function loadCatalogPayload(): Promise<CatalogPayload> {
+  const [settings, products, paymobConfig, categoryMedia] = await Promise.all([
+    loadSiteSettings(),
+    loadManagedProducts(),
+    getPaymobConfig(),
+    loadCategoryMedia(),
+  ]);
+
+  return {
+    settings: {
+      ...settings,
+      // Version media-backed settings URLs the same way as category/product
+      // images, so a poisoned/immutable browser cache can never pin an old file.
+      heroImageUrl: withMediaVersion(settings.heroImageUrl) || settings.heroImageUrl,
+      storyImageUrl: withMediaVersion(settings.storyImageUrl) || settings.storyImageUrl,
+      paymobEnabled:
+        settings.paymobEnabled === "true" && paymobConfig ? "true" : "false",
+    },
+    products,
+    categoryMedia,
   };
 }

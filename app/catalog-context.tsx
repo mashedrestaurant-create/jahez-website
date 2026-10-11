@@ -21,10 +21,20 @@ type CatalogContextValue = {
 
 const CatalogContext = createContext<CatalogContextValue | null>(null);
 
-export function CatalogProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState(defaultProducts);
-  const [settings, setSettings] = useState(defaultSettings);
-  const [categoryMedia, setCategoryMedia] = useState<CategoryMedia>({});
+export function CatalogProvider({
+  children,
+  initialProducts,
+  initialSettings,
+  initialCategoryMedia,
+}: {
+  children: ReactNode;
+  initialProducts?: Product[];
+  initialSettings?: SiteSettings;
+  initialCategoryMedia?: CategoryMedia;
+}) {
+  const [products, setProducts] = useState<Product[]>(initialProducts ?? defaultProducts);
+  const [settings, setSettings] = useState<SiteSettings>(initialSettings ?? defaultSettings);
+  const [categoryMedia, setCategoryMedia] = useState<CategoryMedia>(initialCategoryMedia ?? {});
 
   useEffect(() => {
     let active = true;

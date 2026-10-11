@@ -6,6 +6,12 @@ import "./globals.css";
 import { SiteFrame } from "./site-frame";
 import { EventTracker } from "./event-tracker";
 import { RestaurantJsonLd, WebsiteJsonLd } from "./json-ld";
+import { loadCatalogPayload } from "./server-catalog";
+
+// The site reads live catalog/settings from the database, so every request
+// must render fresh. Without this, the pages would be baked at build time and
+// dashboard edits would not appear until the next deploy.
+export const dynamic = "force-dynamic";
 
 const alexandria = Alexandria({
   subsets: ["arabic", "latin"],
@@ -84,6 +90,14 @@ export default async function RootLayout({
   const host = (hdrs.get("host") || "").split(":")[0];
   const isAdmin = host.startsWith("admin.");
 
+  // Server-render the real catalog so the first paint already shows the saved
+  // images/products/settings. Previously the client rendered defaults, then
+  // replaced them after fetching /api/catalog — which caused old images to
+  // flash and then swap to the new ones on every refresh.
+  const catalog = isAdmin
+    ? null
+    : await loadCatalogPayload().catch(() => null);
+
   return (
     <html lang="ar" dir="rtl" className={`${alexandria.variable} ${cairo.variable}`}>
       <head>
@@ -92,7 +106,17 @@ export default async function RootLayout({
         <WebsiteJsonLd />
       </head>
       <body>
-        {isAdmin ? children : <SiteFrame>{children}</SiteFrame>}
+        {isAdmin ? (
+          children
+        ) : (
+          <SiteFrame
+            initialSettings={catalog?.settings}
+            initialProducts={catalog?.products}
+            initialCategoryMedia={catalog?.categoryMedia}
+          >
+            {children}
+          </SiteFrame>
+        )}
         <EventTracker />
         <SpeedInsights />
       </body>
