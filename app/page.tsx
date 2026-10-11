@@ -7,7 +7,7 @@ import { useLanguage } from "./language-context";
 import { PlainImage as Image } from "./plain-image";
 
 export default function HomePage() {
-  const { products, settings } = useCatalog();
+  const { products, settings, categoryMedia } = useCatalog();
   const { isArabic, t } = useLanguage();
   const featured = products.filter((product) => product.featured).slice(0, 6);
   const whatsapp = settings.whatsappNumber.trim();
@@ -205,7 +205,7 @@ export default function HomePage() {
                 key={category.id}
               >
                 <Image
-                  src={category.image}
+                  src={categoryMedia[category.id]?.image || category.image}
                   alt={isArabic ? category.label : category.labelEn}
                   fill
                   sizes="(max-width: 700px) 90vw, 33vw"
