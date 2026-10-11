@@ -161,14 +161,14 @@ export default function HomePage() {
                   
                 </div>
                 <div className="featured-body">
-                  <span className="product-en">
-                    {isArabic ? product.nameEn : product.name}
-                  </span>
+                  {isArabic && (
+                    <span className="product-en">{product.nameEn}</span>
+                  )}
                   <h3>{isArabic ? product.name : product.nameEn}</h3>
                   <p>{isArabic ? product.description : product.descriptionEn}</p>
                   <div>
                     <span>
-                      <b>{formatPrice(product.price)}</b>
+                      <b>{formatPrice(product.price, isArabic)}</b>
                       <small>{isArabic ? product.unit : product.unitEn}</small>
                     </span>
                     <Link href={`/menu#${product.category}`}>
@@ -212,7 +212,7 @@ export default function HomePage() {
                 />
                 <div className="journey-overlay" />
                 <div>
-                  <span>{isArabic ? category.labelEn : category.label}</span>
+                  {isArabic && <span>{category.labelEn}</span>}
                   <h3>{isArabic ? category.label : category.labelEn}</h3>
                   <b>{t("discover")}</b>
                 </div>

@@ -204,8 +204,8 @@ export default function CartPage() {
     if (subtotal < minimumOrder) {
       setError(
         isArabic
-          ? `الحد الأدنى للطلب ${formatPrice(minimumOrder)}`
-          : `Minimum order is ${formatPrice(minimumOrder)}.`,
+          ? `الحد الأدنى للطلب ${formatPrice(minimumOrder, isArabic)}`
+          : `Minimum order is ${formatPrice(minimumOrder, isArabic)}.`,
       );
       submissionRef.current = false;
       return;
@@ -494,13 +494,13 @@ export default function CartPage() {
                     {lastOrder.items.map((item, i) => (
                       <div className="last-order-line" key={i}>
                         <span>{item.name} × {item.quantity}</span>
-                        <b>{formatPrice(item.price * item.quantity)}</b>
+                        <b>{formatPrice(item.price * item.quantity, isArabic)}</b>
                       </div>
                     ))}
                   </div>
                   <div className="last-order-total">
                     <span>{isArabic ? "الإجمالي" : "Total"}</span>
-                    <b>{formatPrice(lastOrder.total)}</b>
+                    <b>{formatPrice(lastOrder.total, isArabic)}</b>
                   </div>
                   <p className="last-order-date">
                     {isArabic ? "بتاريخ" : "Placed on"} {new Date(lastOrder.createdAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
@@ -526,7 +526,7 @@ export default function CartPage() {
                       <span>JAHEZ</span>
                       <h3>{item.name}</h3>
                       {item.details && <p>{item.details}</p>}
-                      <b>{formatPrice(item.price)}</b>
+                      <b>{formatPrice(item.price, isArabic)}</b>
                     </div>
                     <div className="cart-line-controls">
                       <button
@@ -561,21 +561,21 @@ export default function CartPage() {
                 <div className="cart-total">
                   <div>
                     <span>{isArabic ? "إجمالي الأصناف" : "Subtotal"}</span>
-                    <b>{formatPrice(subtotal)}</b>
+                    <b>{formatPrice(subtotal, isArabic)}</b>
                   </div>
                   <div>
                     <span>{isArabic ? "رسوم التوصيل" : "Delivery fee"}</span>
-                    <b>{formatPrice(deliveryFee)}</b>
+                    <b>{formatPrice(deliveryFee, isArabic)}</b>
                   </div>
                   <div className="cart-grand-total">
                     <span>{isArabic ? "الإجمالي النهائي" : "Total"}</span>
-                    <b>{formatPrice(totalWithDiscount)}</b>
+                    <b>{formatPrice(totalWithDiscount, isArabic)}</b>
                   </div>
                   <p>
                     {freeDeliveryThreshold > 0
                       ? isArabic
-                        ? `التوصيل مجاني للطلبات من ${formatPrice(freeDeliveryThreshold)}`
-                        : `Free delivery from ${formatPrice(freeDeliveryThreshold)}`
+                        ? `التوصيل مجاني للطلبات من ${formatPrice(freeDeliveryThreshold, isArabic)}`
+                        : `Free delivery from ${formatPrice(freeDeliveryThreshold, isArabic)}`
                       : isArabic
                         ? "رسوم التوصيل محسوبة ومضافة قبل تأكيد الطلب"
                         : "Delivery is calculated before you confirm the order."}
@@ -598,7 +598,7 @@ export default function CartPage() {
                   </p>
                   <div className="instapay-total">
                     <span>{isArabic ? "المبلغ المطلوب" : "Amount due"}</span>
-                    <b>{formatPrice(instapayConfirmation.total)}</b>
+                    <b>{formatPrice(instapayConfirmation.total, isArabic)}</b>
                   </div>
                   <div className="instapay-bank-details">
                     <div className="bank-row">
@@ -878,8 +878,8 @@ export default function CartPage() {
                 {form.fulfillment === "delivery" && form.location && locationValid && (
                   <p className="delivery-price-note" style={{ fontWeight: 700 }}>
                     {isArabic
-                      ? `المسافة من الفرع: ${deliveryQuote!.distanceKm} كم — رسوم التوصيل ${formatPrice(deliveryFee)}`
-                      : `Distance from store: ${deliveryQuote!.distanceKm} km — delivery fee ${formatPrice(deliveryFee)}`}
+                      ? `المسافة من الفرع: ${deliveryQuote!.distanceKm} كم — رسوم التوصيل ${formatPrice(deliveryFee, isArabic)}`
+                      : `Distance from store: ${deliveryQuote!.distanceKm} km — delivery fee ${formatPrice(deliveryFee, isArabic)}`}
                   </p>
                 )}
                 {form.fulfillment === "delivery" && (

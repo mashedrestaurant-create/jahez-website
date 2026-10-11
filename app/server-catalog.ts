@@ -32,6 +32,17 @@ function withMediaVersion(url?: string | null): string | undefined {
   return `${url}?v=${MEDIA_CACHE_VERSION}`;
 }
 
+const ARABIC_TEXT = /[\u0600-\u06FF]/;
+
+/**
+ * English fields occasionally get Arabic text typed into them by mistake.
+ * Treat such a value as empty so the caller falls back to a real English one,
+ * otherwise Arabic would leak into the English version of the site.
+ */
+function pickEnglish(value?: string | null): string {
+  return value && !ARABIC_TEXT.test(value) ? value : "";
+}
+
 export async function loadCategoryMedia(): Promise<Record<string, CategoryMedia>> {
   try {
     const dbCats = await prisma.category.findMany();
@@ -79,11 +90,11 @@ export async function loadManagedProducts(includeInactive = false): Promise<Mana
         id: p.slug,
         category: catId,
         name: p.nameAr,
-        nameEn: p.nameEn,
+        nameEn: pickEnglish(p.nameEn) || fallback?.nameEn || p.nameAr,
         description: p.descriptionAr || fallback?.description || "",
-        descriptionEn: p.descriptionEn || fallback?.descriptionEn,
+        descriptionEn: pickEnglish(p.descriptionEn) || fallback?.descriptionEn,
         unit: p.shortDescriptionAr || fallback?.unit || "كيلو كامل",
-        unitEn: p.shortDescriptionEn || fallback?.unitEn || "Full kg",
+        unitEn: pickEnglish(p.shortDescriptionEn) || fallback?.unitEn || "Full kg",
         image: withMediaVersion(p.imageId) || fallback?.image,
         price: p.price,
         featured: p.featured,

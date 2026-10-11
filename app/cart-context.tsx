@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { trackAddToCart } from "./event-tracker";
+import { useLanguage } from "./language-context";
 export type CartItem = {
   key: string;
   id: string;
@@ -51,6 +52,7 @@ function readCookie() {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { isArabic } = useLanguage();
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [notice, setNotice] = useState("");
@@ -125,7 +127,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
             },
           ];
         });
-        setNotice(`تمت إضافة ${item.name} للسلة`);
+        setNotice(
+          isArabic
+            ? `تمت إضافة ${item.name} للسلة`
+            : `${item.name} added to your cart`,
+        );
         window.setTimeout(() => setNotice(""), 2200);
       },
       removeItem: (key) =>
@@ -150,7 +156,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [items, notice, lastOrder],
+    [items, notice, lastOrder, isArabic],
   );
 
   return (

@@ -6,10 +6,9 @@ import { useLanguage } from "../language-context";
 export default function LocationsPage() {
   const { settings } = useCatalog();
   const { isArabic } = useLanguage();
-  const storeAddress =
-    (isArabic ? settings.storeAddressAr : "") ||
-    settings.pickupAddressAr ||
-    "";
+  const storeAddress = isArabic
+    ? settings.storeAddressAr || settings.pickupAddressAr || ""
+    : settings.pickupAddressEn || "";
 
   return (
     <>

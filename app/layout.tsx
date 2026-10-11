@@ -26,63 +26,129 @@ const cairo = Cairo({
   variable: "--font-cairo",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "جاهز | أكل البيت من غير وقت التحضير",
-    template: "%s | جاهز JAHEZ",
-  },
-  description:
-    "منتجات ووجبات مجهزة بعناية وجاهزة للتسوية أو التقديم. طلب قبل الموعد بـ24 ساعة مع توصيل للتجمع والرحاب أو استلام.",
-  keywords: [
-    "جاهز",
-    "Jahez",
-    "وجبات جاهزة",
-    "أكل بيتي",
-    "مكونات مجهزة",
-    "فراخ متبلة",
-    "لحوم متبلة",
-    "توصيل التجمع",
-    "توصيل الرحاب",
-    "ready to cook Egypt",
-  ],
-  icons: {
-    icon: "/assets/jahez/logo.jpg",
-    apple: "/assets/jahez/logo.jpg",
-  },
-  openGraph: {
-    title: "جاهز | طعم البيت من غير وقت التحضير",
-    description:
-      "وجبات ومكونات مجهزة بعناية، تطلبيها قبلها بـ24 ساعة ونوصلها للتجمع والرحاب أو تستلميها.",
-    type: "website",
-    locale: "ar_EG",
-    siteName: "جاهز JAHEZ",
-    images: [
-      {
-        url: "/assets/jahez/menu-original.jpg",
-        width: 1200,
-        height: 630,
-        alt: "منيو جاهز للوجبات والمكونات المجهزة",
+export async function generateMetadata(): Promise<Metadata> {
+  const isArabic = (await cookies()).get("jahez-language")?.value !== "en";
+  const host = (await headers()).get("host") || "jahez-website-green.vercel.app";
+  const metadataBase = new URL(
+    `${host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https"}://${host}`,
+  );
+
+  if (!isArabic) {
+    return {
+      metadataBase,
+      title: {
+        default: "Jahez | Homestyle taste without the prep time",
+        template: "%s | JAHEZ",
       },
+      description:
+        "Carefully prepared meals and ingredients, ready to cook or serve. Order 24 hours ahead with delivery in New Cairo or pickup.",
+      keywords: [
+        "Jahez",
+        "ready to cook Egypt",
+        "prepared ingredients",
+        "seasoned chicken",
+        "seasoned beef",
+        "New Cairo delivery",
+      ],
+      icons: {
+        icon: "/assets/jahez/logo.jpg",
+        apple: "/assets/jahez/logo.jpg",
+      },
+      openGraph: {
+        title: "Jahez | Homestyle taste without the prep time",
+        description:
+          "Carefully prepared meals and ingredients. Order 24 hours ahead and we deliver in New Cairo or you pick up.",
+        type: "website",
+        locale: "en_US",
+        siteName: "JAHEZ",
+        images: [
+          {
+            url: "/assets/jahez/menu-original.jpg",
+            width: 1200,
+            height: 630,
+            alt: "Jahez menu of prepared meals and ingredients",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Jahez | Homestyle taste without the prep time",
+        description: "Everyday luxury, prepared.",
+        images: ["/assets/jahez/menu-original.jpg"],
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+    };
+  }
+
+  return {
+    metadataBase,
+    title: {
+      default: "جاهز | أكل البيت من غير وقت التحضير",
+      template: "%s | جاهز JAHEZ",
+    },
+    description:
+      "منتجات ووجبات مجهزة بعناية وجاهزة للتسوية أو التقديم. طلب قبل الموعد بـ24 ساعة مع توصيل للتجمع والرحاب أو استلام.",
+    keywords: [
+      "جاهز",
+      "Jahez",
+      "وجبات جاهزة",
+      "أكل بيتي",
+      "مكونات مجهزة",
+      "فراخ متبلة",
+      "لحوم متبلة",
+      "توصيل التجمع",
+      "توصيل الرحاب",
+      "ready to cook Egypt",
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "جاهز | طعم البيت من غير وقت التحضير",
-    description: "Everyday luxury, prepared.",
-    images: ["/assets/jahez/menu-original.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    icons: {
+      icon: "/assets/jahez/logo.jpg",
+      apple: "/assets/jahez/logo.jpg",
+    },
+    openGraph: {
+      title: "جاهز | طعم البيت من غير وقت التحضير",
+      description:
+        "وجبات ومكونات مجهزة بعناية، تطلبيها قبلها بـ24 ساعة ونوصلها للتجمع والرحاب أو تستلميها.",
+      type: "website",
+      locale: "ar_EG",
+      siteName: "جاهز JAHEZ",
+      images: [
+        {
+          url: "/assets/jahez/menu-original.jpg",
+          width: 1200,
+          height: 630,
+          alt: "منيو جاهز للوجبات والمكونات المجهزة",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "جاهز | طعم البيت من غير وقت التحضير",
+      description: "Everyday luxury, prepared.",
+      images: ["/assets/jahez/menu-original.jpg"],
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-};
+  };
+}
 
 export default async function RootLayout({
   children,

@@ -45,7 +45,7 @@ export function OfferCard({
   const discountLabel =
     offer.discountType === "percentage"
       ? `${offer.discountValue}%`
-      : formatPrice(offer.discountValue);
+      : formatPrice(offer.discountValue, isArabic);
   const hasDate = offer.startDate && offer.endDate;
   const actionLabel = isArabic
     ? offer.actionTextAr || offer.actionTextEn || "اطلب الآن"
@@ -118,7 +118,7 @@ export function FeaturedOffer({
   const discountLabel =
     offer.discountType === "percentage"
       ? `${offer.discountValue}%`
-      : formatPrice(offer.discountValue);
+      : formatPrice(offer.discountValue, isArabic);
   const actionLabel = isArabic
     ? offer.actionTextAr || offer.actionTextEn || "اطلب الآن"
     : offer.actionTextEn || offer.actionTextAr || "Order Now";

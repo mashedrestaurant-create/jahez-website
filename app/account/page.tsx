@@ -355,6 +355,7 @@ export default function AccountPage() {
                       <b>
                         {formatPrice(
                           (item.price || 0) * (item.quantity || 1),
+                          isArabic,
                         )}
                       </b>
                     </div>
@@ -365,17 +366,17 @@ export default function AccountPage() {
                     <span>
                       {isArabic ? "إجمالي الأصناف" : "Subtotal"}
                     </span>
-                    <b>{formatPrice(selectedOrder.subtotal)}</b>
+                    <b>{formatPrice(selectedOrder.subtotal, isArabic)}</b>
                   </div>
                   <div>
                     <span>
                       {isArabic ? "رسوم التوصيل" : "Delivery"}
                     </span>
-                    <b>{formatPrice(selectedOrder.deliveryFee)}</b>
+                    <b>{formatPrice(selectedOrder.deliveryFee, isArabic)}</b>
                   </div>
                   <div className="cart-grand-total">
                     <span>{isArabic ? "الإجمالي" : "Total"}</span>
-                    <b>{formatPrice(selectedOrder.total)}</b>
+                    <b>{formatPrice(selectedOrder.total, isArabic)}</b>
                   </div>
                 </div>
                 <div className="order-detail-meta">
@@ -499,7 +500,7 @@ export default function AccountPage() {
                           )}
                         </div>
                         <div className="order-card-footer">
-                          <b>{formatPrice(order.total)}</b>
+                          <b>{formatPrice(order.total, isArabic)}</b>
                           <div className="order-card-actions">
                             <button
                               className="text-link"

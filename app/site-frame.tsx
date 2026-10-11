@@ -53,7 +53,7 @@ function Header() {
               type="button"
               className="language-toggle"
               onClick={toggleLanguage}
-              aria-label={language === "ar" ? "Switch to English" : "التبديل للعربية"}
+              aria-label={language === "ar" ? "التبديل للإنجليزية" : "Switch to Arabic"}
             >
               {t("language")}
             </button>

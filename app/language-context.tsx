@@ -79,7 +79,7 @@ const copy = {
     all: "All",
     add: "Add to cart",
     hot: "Spicy",
-    language: "العربية",
+    language: "Arabic",
     footerCopy: "Carefully prepared products and meals that save prep time while you add the final touch at home.",
     branch: "Pickup",
     branchName: "Jahez Pickup Point",

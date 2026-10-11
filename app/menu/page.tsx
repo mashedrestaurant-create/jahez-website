@@ -161,16 +161,16 @@ export default function MenuPage() {
                             <h3>{isArabic ? product.name : product.nameEn}</h3>
                             {product.spicy && <span className="spicy-label">{t("hot")}</span>}
                           </div>
-                          <span className="product-en">
-                            {isArabic ? product.nameEn : product.name}
-                          </span>
+                          {isArabic && (
+                            <span className="product-en">{product.nameEn}</span>
+                          )}
                           <p>{isArabic ? product.description : product.descriptionEn}</p>
                           <span className="jahez-unit-pill">
                             {isArabic ? product.unit : product.unitEn}
                           </span>
                         </div>
                         <div className="menu-item-action">
-                          <b>{formatPrice(product.price)}</b>
+                          <b>{formatPrice(product.price, isArabic)}</b>
                           {(() => {
                             const entry = items.find((i) => i.id === product.id);
                             const qty = entry?.quantity ?? 0;

@@ -367,8 +367,9 @@ export const productFallbacks: Record<CategoryId, string> = {
   appetizers: "/assets/jahez/appetizers.jpg",
 };
 
-export function formatPrice(price: number) {
-  return `${new Intl.NumberFormat("en-US", {
+export function formatPrice(price: number, isArabic = true) {
+  const value = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
-  }).format(price)} ج.م`;
+  }).format(price);
+  return isArabic ? `${value} ج.م` : `${value} EGP`;
 }
