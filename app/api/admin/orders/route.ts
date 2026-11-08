@@ -50,5 +50,20 @@ export async function GET(request: NextRequest) {
     prisma.order.count({ where }),
   ]);
 
-  return json({ ok: true, items, total, page, limit, pages: Math.ceil(total / limit) });
+  const toEgp = (piasters: number | null | undefined) => Math.round(Number(piasters || 0)) / 100;
+  const normalizedItems = items.map((order) => ({
+    ...order,
+    subtotal: toEgp(order.subtotal),
+    deliveryFee: toEgp(order.deliveryFee),
+    discount: toEgp(order.discountAmount),
+    discountAmount: toEgp(order.discountAmount),
+    total: toEgp(order.total),
+    items: order.items.map((item) => ({
+      ...item,
+      unitPrice: toEgp(item.unitPrice),
+      totalPrice: toEgp(item.totalPrice),
+    })),
+  }));
+
+  return json({ ok: true, items: normalizedItems, total, page, limit, pages: Math.ceil(total / limit) });
 }
