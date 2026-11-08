@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { prisma } from "../../lib/prisma";
+import { sendAdminOrderPush } from "../../lib/admin-push";
 import {
   calculateOrderSubtotal,
   validateOrderItems,
@@ -16,6 +18,7 @@ import { loadSiteSettings } from "../../server-settings";
 import { quoteDelivery } from "../../delivery-distance";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export const maxDuration = 60;
 
 function generateRequestId() {
@@ -472,6 +475,13 @@ export async function POST(request: Request) {
     }
 
     logOrder(requestId, "ORDER_SAVED", { orderId: order.orderNumber });
+    after(async () => {
+      try {
+        await sendAdminOrderPush(order.orderNumber);
+      } catch (pushError) {
+        logOrderError(requestId, "ADMIN_PUSH_FAILED", pushError, { orderId: order.orderNumber });
+      }
+    });
 
     // ── Paymob flow ──
     if (paymentMethod === "paymob" && paymobConfig) {

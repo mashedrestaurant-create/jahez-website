@@ -267,3 +267,7 @@
 @media (max-width: 760px) {
   .jahez-enable-alerts { max-width: 122px; padding: 8px 9px; font-size: 10px; white-space: normal; line-height: 1.2; }
 }
+
+.jahez-push-active,.jahez-push-blocked{font-size:11px;white-space:nowrap}
+.jahez-push-active{color:#197042;font-weight:800}
+.jahez-push-blocked{max-width:180px;color:#a54132;text-align:center}

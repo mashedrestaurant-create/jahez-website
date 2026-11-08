@@ -29,7 +29,8 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "sharp": "^0.35.3",
-    "zustand": "^5.0.15"
+    "zustand": "^5.0.15",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
