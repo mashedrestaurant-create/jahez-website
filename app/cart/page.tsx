@@ -44,6 +44,7 @@ export default function CartPage() {
   const [sending, setSending] = useState(false);
   const [failedOrderId, setFailedOrderId] = useState<number | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const [instapayConfirmation, setInstapayConfirmation] = useState<{
     orderId: number;
     total: number;
@@ -380,6 +381,7 @@ export default function CartPage() {
           "noopener,noreferrer",
         );
       }
+      setOrderPlaced(true);
       saveLastOrder({
         orderId: Number(p.orderId),
         items: confirmedItems.map((item) => ({
@@ -476,20 +478,26 @@ export default function CartPage() {
           {items.length === 0 && !instapayConfirmation ? (
             <div className="empty-state">
               <div>
-                <h2>{isArabic ? "السلة لسه فاضية" : "Your cart is empty"}</h2>
-                <p>
-                  {isArabic
-                    ? "اختاري الأصناف من المنيو وارجعي هنا نكمّل الطلب"
-                    : "Choose your items from the menu, then come back to complete the order."}
-                </p>
-                <Link href="/menu" className="button button-primary">
-                  {t("menu")}
-                </Link>
+                {orderPlaced && lastOrder ? (
+                  <>
+                    <div aria-hidden="true" style={{ width: 54, height: 54, display: "grid", placeItems: "center", marginBottom: 16, borderRadius: "50%", color: "#fff", background: "#198754", fontSize: 28, fontWeight: 800 }}>✓</div>
+                    <span className="kicker">{isArabic ? "تم استلام الطلب" : "ORDER RECEIVED"}</span>
+                    <h2>{isArabic ? "طلبك اتسجل بنجاح" : "We’ve received your order"}</h2>
+                    <p>{isArabic ? "احتفظي برقم الطلب لمتابعته. تفاصيل طلبك ظاهرة هنا." : "Keep your order number for reference. Your order details are below."}</p>
+                    <p className="last-order-id">#{lastOrder.orderId}</p>
+                  </>
+                ) : (
+                  <>
+                    <h2>{isArabic ? "السلة لسه فاضية" : "Your cart is empty"}</h2>
+                    <p>{isArabic ? "اختاري الأصناف من المنيو وارجعي هنا نكمّل الطلب" : "Choose your items from the menu, then come back to complete the order."}</p>
+                    {!lastOrder && <Link href="/menu" className="button button-primary">{t("menu")}</Link>}
+                  </>
+                )}
               </div>
               {lastOrder && (
                 <div className="last-order-recap">
-                  <h3>{isArabic ? "آخر طلب لك" : "Your last order"}</h3>
-                  <span className="last-order-id">#{lastOrder.orderId}</span>
+                  <h3>{orderPlaced ? (isArabic ? "تفاصيل طلبك" : "Order details") : (isArabic ? "آخر طلب لك" : "Your last order")}</h3>
+                  {!orderPlaced && <span className="last-order-id">#{lastOrder.orderId}</span>}
                   <div className="last-order-items">
                     {lastOrder.items.map((item, i) => (
                       <div className="last-order-line" key={i}>
