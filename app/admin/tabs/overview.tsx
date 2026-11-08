@@ -32,7 +32,8 @@ const STATUS_MAP: Record<string, { en: string; ar: string; color: string; bg: st
 };
 
 function money(value: number, lang: "ar" | "en") {
-  return "EGP " + Number(value || 0).toLocaleString(lang === "en" ? "en-EG" : "ar-EG");
+  const formatted = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value) || 0);
+  return lang === "ar" ? formatted + " ج.م" : "EGP " + formatted;
 }
 
 export function OverviewTab() {
@@ -76,7 +77,7 @@ export function OverviewTab() {
         {cards.map((card) => (
           <article key={card.label} className={"jahez-stat-card tone-" + card.tone}>
             <span>{card.label}</span>
-            <strong>{card.value}</strong>
+            <strong dir="ltr">{card.value}</strong>
           </article>
         ))}
       </div>
@@ -100,9 +101,9 @@ export function OverviewTab() {
                 const status = STATUS_MAP[order.status];
                 return (
                   <tr key={order.id}>
-                    <td className="jahez-order-number">JH-{String(order.orderNumber).padStart(6, "0")}</td>
+                    <td className="jahez-order-number"><bdi dir="ltr">JH-{String(order.orderNumber).padStart(6, "0")}</bdi></td>
                     <td>{order.customerName || (english ? "Guest" : "عميل")}</td>
-                    <td>{money(order.total, lang)}</td>
+                    <td><bdi dir="ltr">{money(order.total, lang)}</bdi></td>
                     <td><span className="jahez-status-badge" style={{ color: status?.color || "#6b7280", background: status?.bg || "#f3f4f6" }}>{status ? (english ? status.en : status.ar) : order.status}</span></td>
                   </tr>
                 );
