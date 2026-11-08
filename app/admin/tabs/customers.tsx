@@ -134,7 +134,7 @@ export function CustomersTab() {
                       {c.orderCount ?? 0}
                     </td>
                     <td className="px-4 py-3 text-center font-semibold" style={{ color: "#0a2d1d" }}>
-                      {formatEgp(Number(c.totalSpent || 0))} ج.م
+                      <bdi dir="ltr">{formatEgp(Number(c.totalSpent || 0))} ج.م</bdi>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
                       {c.firstVisit
