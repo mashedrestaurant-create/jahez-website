@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useCart } from "../../cart-context";
 import { useLanguage } from "../../language-context";
-import { formatWhatsAppOrder } from "../../whatsapp-message";
+import { buildWhatsAppUrl, formatWhatsAppOrder } from "../../whatsapp-message";
 import { trackEvent } from "../../event-tracker";
 import { useCatalog } from "../../catalog-context";
 
@@ -81,9 +81,8 @@ function PaymentResultContent() {
       })
     : "";
 
-  const whatsappNumber = settings.whatsappNumber.trim();
-  const whatsappUrl = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}${whatsappMessage ? `?text=${encodeURIComponent(whatsappMessage)}` : ""}`
+  const whatsappUrl = whatsappMessage
+    ? buildWhatsAppUrl(settings.whatsappNumber, whatsappMessage) || ""
     : "";
 
   return (

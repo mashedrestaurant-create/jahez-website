@@ -1,3 +1,5 @@
+import { normalizeEgyptianMobile } from "./egypt-phone";
+
 export type WhatsAppOrderItem = {
   id: string;
   name: string;
@@ -102,4 +104,14 @@ export function formatWhatsAppOrder(input: WhatsAppOrderInput) {
   if (input.notes) lines.push(input.notes);
 
   return lines.join("\n");
+}
+
+
+export function buildWhatsAppUrl(phone: string, message: string) {
+  const raw = phone.trim();
+  if (!raw) return null;
+  const localEgyptian = normalizeEgyptianMobile(raw);
+  const international = localEgyptian ? `20${localEgyptian.slice(1)}` : raw.replace(/\D/g, "");
+  if (international.length < 8 || international.length > 15) return null;
+  return `https://wa.me/${international}?text=${encodeURIComponent(message)}`;
 }
