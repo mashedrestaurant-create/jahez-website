@@ -119,8 +119,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const highest = orders.reduce((max: number, order: { orderNumber?: number }) => Math.max(max, Number(order.orderNumber) || 0), 0);
         if (lastSeenOrderNumber.current === null) {
           const stored = readLastSeenOrderNumber();
-          lastSeenOrderNumber.current = stored > 0 ? stored : highest;
-          if (highest <= lastSeenOrderNumber.current) {
+          const initialLastSeen = stored > 0 ? stored : highest;
+          lastSeenOrderNumber.current = initialLastSeen;
+          if (highest <= initialLastSeen) {
             storeLastSeenOrderNumber(highest);
             return;
           }
