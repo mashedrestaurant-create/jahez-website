@@ -131,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           .sort((a: { orderNumber?: number }, b: { orderNumber?: number }) => (Number(a.orderNumber) || 0) - (Number(b.orderNumber) || 0));
         if (highest > lastSeen) {
           lastSeenOrderNumber.current = highest;
-          window.localStorage.setItem("jahez-admin-last-seen-order", String(highest));
+          storeLastSeenOrderNumber(highest);
         }
         if (!freshOrders.length) return;
         const newest = freshOrders[freshOrders.length - 1];
