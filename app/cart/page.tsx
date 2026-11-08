@@ -44,6 +44,7 @@ export default function CartPage() {
   const [sending, setSending] = useState(false);
   const [failedOrderId, setFailedOrderId] = useState<number | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const [instapayConfirmation, setInstapayConfirmation] = useState<{
     orderId: number;
     total: number;
@@ -380,6 +381,7 @@ export default function CartPage() {
           "noopener,noreferrer",
         );
       }
+      setOrderPlaced(true);
       saveLastOrder({
         orderId: Number(p.orderId),
         items: confirmedItems.map((item) => ({
@@ -476,34 +478,40 @@ export default function CartPage() {
           {items.length === 0 && !instapayConfirmation ? (
             <div className="empty-state">
               <div>
-                <h2>{isArabic ? "السلة لسه فاضية" : "Your cart is empty"}</h2>
-                <p>
-                  {isArabic
-                    ? "اختاري الأصناف من المنيو وارجعي هنا نكمّل الطلب"
-                    : "Choose your items from the menu, then come back to complete the order."}
-                </p>
-                <Link href="/menu" className="button button-primary">
-                  {t("menu")}
-                </Link>
+                {orderPlaced && lastOrder ? (
+                  <>
+                    <div aria-hidden="true" style={{ width: 54, height: 54, display: "grid", placeItems: "center", marginBottom: 16, borderRadius: "50%", color: "#fff", background: "#198754", fontSize: 28, fontWeight: 800 }}>✓</div>
+                    <span className="kicker">{isArabic ? "تم استلام الطلب" : "ORDER RECEIVED"}</span>
+                    <h2>{isArabic ? "طلبك اتسجل بنجاح" : "We’ve received your order"}</h2>
+                    <p>{isArabic ? "رقم طلبك للمتابعة ظاهر هنا، وتفاصيل الطلب بالأسفل." : "Keep your order number for reference. Your order details are below."}</p>
+                    <p className="last-order-id"><bdi dir="ltr">#{lastOrder.orderId}</bdi></p>
+                  </>
+                ) : (
+                  <>
+                    <h2>{isArabic ? "السلة لسه فاضية" : "Your cart is empty"}</h2>
+                    <p>{isArabic ? "اختاري الأصناف من المنيو وارجعي هنا نكمّل الطلب" : "Choose your items from the menu, then come back to complete the order."}</p>
+                    {!lastOrder && <Link href="/menu" className="button button-primary">{t("menu")}</Link>}
+                  </>
+                )}
               </div>
               {lastOrder && (
                 <div className="last-order-recap">
-                  <h3>{isArabic ? "آخر طلب لك" : "Your last order"}</h3>
-                  <span className="last-order-id">#{lastOrder.orderId}</span>
+                  <h3>{orderPlaced ? (isArabic ? "تفاصيل طلبك" : "Order details") : (isArabic ? "آخر طلب لك" : "Your last order")}</h3>
+                  {!orderPlaced && <span className="last-order-id"><bdi dir="ltr">#{lastOrder.orderId}</bdi></span>}
                   <div className="last-order-items">
                     {lastOrder.items.map((item, i) => (
                       <div className="last-order-line" key={i}>
                         <span>{item.name} × {item.quantity}</span>
-                        <b>{formatPrice(item.price * item.quantity, isArabic)}</b>
+                        <b><bdi dir="ltr">{formatPrice(item.price * item.quantity, isArabic)}</bdi></b>
                       </div>
                     ))}
                   </div>
                   <div className="last-order-total">
                     <span>{isArabic ? "الإجمالي" : "Total"}</span>
-                    <b>{formatPrice(lastOrder.total, isArabic)}</b>
+                    <b><bdi dir="ltr">{formatPrice(lastOrder.total, isArabic)}</bdi></b>
                   </div>
                   <p className="last-order-date">
-                    {isArabic ? "بتاريخ" : "Placed on"} {new Date(lastOrder.createdAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    {isArabic ? "بتاريخ" : "Placed on"} <time dir="ltr">{new Date(lastOrder.createdAt).toLocaleDateString(isArabic ? "ar-EG-u-nu-latn" : "en-US", { year: "numeric", month: "short", day: "numeric" })}</time>
                   </p>
                   <Link href="/menu" className="button button-primary">
                     {isArabic ? "اعمل طلب جديد" : "Order again"}

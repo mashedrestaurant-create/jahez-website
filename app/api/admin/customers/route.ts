@@ -13,5 +13,9 @@ export async function GET(request: NextRequest) {
     orderBy: { createdAt: "desc" },
     page,
   });
-  return json({ ok: true, ...data });
+  const items = data.items.map((customer) => ({
+    ...customer,
+    totalSpent: Math.round(Number(customer.totalSpent || 0)) / 100,
+  }));
+  return json({ ok: true, ...data, items });
 }

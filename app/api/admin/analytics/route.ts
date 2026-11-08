@@ -137,6 +137,11 @@ export async function GET(request: NextRequest) {
       where: { type: "pickup", createdAt: { gte: since } },
     });
 
+    const dailyOrdersInEgp = (dailyOrders as { date: string; count: number; revenue: number | string }[]).map((day) => ({
+      ...day,
+      revenue: Math.round(Number(day.revenue || 0)) / 100,
+    }));
+
     const topPagesTyped = (topPages as { page: string; count: number }[]).map(p => ({
       page: p.page || "/",
       count: Number(p.count),
@@ -159,7 +164,7 @@ export async function GET(request: NextRequest) {
       },
       orders: {
         total: orderStats._count,
-        revenue: orderStats._sum.total || 0,
+        revenue: Math.round(Number(orderStats._sum.total || 0)) / 100,
         paid: paidOrders,
         cash: cashOrders,
         instapay: instapayOrders,
@@ -171,7 +176,7 @@ export async function GET(request: NextRequest) {
         unique: uniqueVisitors,
         totalCustomers,
       },
-      dailyOrders,
+      dailyOrders: dailyOrdersInEgp,
       dailyEvents,
       recentEvents,
       topPages: topPagesTyped,
