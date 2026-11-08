@@ -36,6 +36,8 @@ export async function generateMetadata(): Promise<Metadata> {
   if (!isArabic) {
     return {
       metadataBase,
+      manifest: "/manifest.webmanifest",
+      appleWebApp: { capable: true, title: "JAHEZ", statusBarStyle: "default" },
       title: {
         default: "Jahez | Homestyle taste without the prep time",
         template: "%s | JAHEZ",
@@ -92,6 +94,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase,
+    manifest: "/manifest.webmanifest",
+    appleWebApp: { capable: true, title: "جاهز", statusBarStyle: "default" },
     title: {
       default: "جاهز | أكل البيت من غير وقت التحضير",
       template: "%s | جاهز JAHEZ",

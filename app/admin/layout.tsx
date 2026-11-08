@@ -51,6 +51,13 @@ function playAdminOrderTone(context: AudioContext | null) {
   } catch {}
 }
 
+function base64UrlToArrayBuffer(value: string) {
+  const padded = value + "=".repeat((4 - value.length % 4) % 4);
+  const base64 = padded.replace(/-/g, "+").replace(/_/g, "/");
+  const binary = window.atob(base64);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0)).buffer as ArrayBuffer;
+}
+
 function NavIcon({ name }: { name: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   return (
@@ -80,13 +87,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isLoginPage = pathname === "/admin/login";
   const [newOrderNotice, setNewOrderNotice] = useState<NewOrderNotice | null>(null);
   const [newOrderCount, setNewOrderCount] = useState(0);
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | "unsupported">("default");
+  const [pushStatus, setPushStatus] = useState<"checking" | "ready" | "enabled" | "loading" | "blocked" | "error" | "unsupported">("checking");
   const lastSeenOrderNumber = useRef<number | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    if ("Notification" in window) setNotificationPermission(Notification.permission);
-    else setNotificationPermission("unsupported");
+    if (isLoginPage) return;
+    const pushSupported = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+    if (!pushSupported) setPushStatus("unsupported");
+    else if (Notification.permission === "denied") setPushStatus("blocked");
+    else {
+      navigator.serviceWorker.register("/sw.js")
+        .then(async (registration) => {
+          const subscription = await registration.pushManager.getSubscription();
+          if (!subscription) { setPushStatus("ready"); return; }
+          const response = await fetch("/api/admin/push", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(subscription),
+          });
+          setPushStatus(response.ok ? "enabled" : "ready");
+        })
+        .catch(() => setPushStatus("ready"));
+    }
     const unlockAudio = () => {
       try {
         if (!audioContextRef.current) audioContextRef.current = new window.AudioContext();
@@ -95,7 +118,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
     window.addEventListener("pointerdown", unlockAudio);
     return () => window.removeEventListener("pointerdown", unlockAudio);
-  }, []);
+  }, [isLoginPage]);
+
+  const enablePushAlerts = async () => {
+    if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
+      setPushStatus("unsupported");
+      return;
+    }
+    setPushStatus("loading");
+    try {
+      const permission = Notification.permission === "granted"
+        ? "granted"
+        : await Notification.requestPermission();
+      if (permission !== "granted") {
+        setPushStatus("blocked");
+        return;
+      }
+      const keyResponse = await fetch("/api/admin/push");
+      if (!keyResponse.ok) throw new Error("Push setup is unavailable");
+      const { publicKey } = await keyResponse.json() as { publicKey?: string };
+      if (!publicKey) throw new Error("Push public key is missing");
+      const registration = await navigator.serviceWorker.register("/sw.js");
+      const existing = await registration.pushManager.getSubscription();
+      const subscription = existing || await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: base64UrlToArrayBuffer(publicKey),
+      });
+      const response = await fetch("/api/admin/push", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(subscription),
+      });
+      if (!response.ok) throw new Error("Could not save this device");
+      setPushStatus("enabled");
+    } catch {
+      setPushStatus("error");
+    }
+  };
 
   useEffect(() => {
     if (isLoginPage) return;
@@ -144,7 +203,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setNewOrderNotice(notice);
         playAdminOrderTone(audioContextRef.current);
         if ("vibrate" in navigator) navigator.vibrate([220, 90, 220]);
-        if ("Notification" in window && Notification.permission === "granted") {
+        if (pushStatus !== "enabled" && "Notification" in window && Notification.permission === "granted") {
           const desktopNotice = new Notification(lang === "ar" ? "طلب جديد من جاهز" : "New JAHEZ order", {
             body: "#" + notice.orderNumber + " · " + notice.customerName,
             tag: "jahez-order-" + notice.orderNumber,
@@ -166,7 +225,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [admin?.id, isLoginPage, lang, setActiveTab]);
+  }, [admin?.id, isLoginPage, lang, pushStatus, setActiveTab]);
 
   if (isLoginPage) return <>{children}</>;
 
@@ -218,10 +277,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span>{english ? "JAHEZ / OPERATIONS" : "جاهز / الإدارة"}</span>
             <strong>{title ? (english ? title.en : title.ar) : "Overview"}</strong>
           </div>
-          {notificationPermission === "default" && (
-            <button className="jahez-enable-alerts" onClick={async () => {
-              if ("Notification" in window) setNotificationPermission(await Notification.requestPermission());
-            }}>{english ? "Enable alerts" : "تفعيل إشعارات الجهاز"}</button>
+          {pushStatus === "enabled" ? (
+            <span className="jahez-push-active">{english ? "Order alerts on" : "تنبيهات الطلبات مفعّلة"}</span>
+          ) : pushStatus === "blocked" ? (
+            <span className="jahez-push-blocked">{english ? "Allow notifications in browser settings" : "اسمح بالإشعارات من إعدادات المتصفح"}</span>
+          ) : pushStatus === "unsupported" ? null : (
+            <button className="jahez-enable-alerts" onClick={enablePushAlerts} disabled={pushStatus === "loading" || pushStatus === "checking"}>
+              {pushStatus === "loading"
+                ? (english ? "Connecting…" : "جاري التفعيل…")
+                : pushStatus === "error"
+                  ? (english ? "Retry alerts" : "إعادة تفعيل الإشعارات")
+                  : (english ? "Enable order alerts" : "تفعيل إشعارات الطلبات")}
+            </button>
           )}
           <div className="jahez-workspace-pill"><span />{english ? "Admin workspace" : "مساحة الإدارة"}{newOrderCount > 0 && <b className="jahez-order-count">{newOrderCount}</b>}</div>
         </header>

@@ -1,0 +1,18 @@
+{
+  "id": "/admin",
+  "name": "جاهز — لوحة الإدارة",
+  "short_name": "جاهز الإدارة",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f7f5",
+  "theme_color": "#123f2c",
+  "icons": [
+    {
+      "src": "/assets/jahez/logo-square.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
