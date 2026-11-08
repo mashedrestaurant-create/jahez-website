@@ -483,8 +483,8 @@ export default function CartPage() {
                     <div aria-hidden="true" style={{ width: 54, height: 54, display: "grid", placeItems: "center", marginBottom: 16, borderRadius: "50%", color: "#fff", background: "#198754", fontSize: 28, fontWeight: 800 }}>✓</div>
                     <span className="kicker">{isArabic ? "تم استلام الطلب" : "ORDER RECEIVED"}</span>
                     <h2>{isArabic ? "طلبك اتسجل بنجاح" : "We’ve received your order"}</h2>
-                    <p>{isArabic ? "احتفظي برقم الطلب لمتابعته. تفاصيل طلبك ظاهرة هنا." : "Keep your order number for reference. Your order details are below."}</p>
-                    <p className="last-order-id">#{lastOrder.orderId}</p>
+                    <p>{isArabic ? "رقم طلبك للمتابعة ظاهر هنا، وتفاصيل الطلب بالأسفل." : "Keep your order number for reference. Your order details are below."}</p>
+                    <p className="last-order-id"><bdi dir="ltr">#{lastOrder.orderId}</bdi></p>
                   </>
                 ) : (
                   <>
@@ -497,21 +497,21 @@ export default function CartPage() {
               {lastOrder && (
                 <div className="last-order-recap">
                   <h3>{orderPlaced ? (isArabic ? "تفاصيل طلبك" : "Order details") : (isArabic ? "آخر طلب لك" : "Your last order")}</h3>
-                  {!orderPlaced && <span className="last-order-id">#{lastOrder.orderId}</span>}
+                  {!orderPlaced && <span className="last-order-id"><bdi dir="ltr">#{lastOrder.orderId}</bdi></span>}
                   <div className="last-order-items">
                     {lastOrder.items.map((item, i) => (
                       <div className="last-order-line" key={i}>
                         <span>{item.name} × {item.quantity}</span>
-                        <b>{formatPrice(item.price * item.quantity, isArabic)}</b>
+                        <b><bdi dir="ltr">{formatPrice(item.price * item.quantity, isArabic)}</bdi></b>
                       </div>
                     ))}
                   </div>
                   <div className="last-order-total">
                     <span>{isArabic ? "الإجمالي" : "Total"}</span>
-                    <b>{formatPrice(lastOrder.total, isArabic)}</b>
+                    <b><bdi dir="ltr">{formatPrice(lastOrder.total, isArabic)}</bdi></b>
                   </div>
                   <p className="last-order-date">
-                    {isArabic ? "بتاريخ" : "Placed on"} {new Date(lastOrder.createdAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    {isArabic ? "بتاريخ" : "Placed on"} <time dir="ltr">{new Date(lastOrder.createdAt).toLocaleDateString(isArabic ? "ar-EG-u-nu-latn" : "en-US", { year: "numeric", month: "short", day: "numeric" })}</time>
                   </p>
                   <Link href="/menu" className="button button-primary">
                     {isArabic ? "اعمل طلب جديد" : "Order again"}
