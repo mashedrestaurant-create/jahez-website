@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+function formatEgp(value: number) {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value) || 0);
+}
+
 type Customer = {
   id: string;
   name: string;
@@ -130,11 +134,11 @@ export function CustomersTab() {
                       {c.orderCount ?? 0}
                     </td>
                     <td className="px-4 py-3 text-center font-semibold" style={{ color: "#0a2d1d" }}>
-                      {Number(c.totalSpent || 0).toLocaleString("ar-EG")} ج.م
+                      {formatEgp(Number(c.totalSpent || 0))} ج.م
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
                       {c.firstVisit
-                        ? new Date(c.firstVisit).toLocaleDateString("ar-EG")
+                        ? <time dir="ltr">{new Date(c.firstVisit).toLocaleDateString("ar-EG-u-nu-latn", { year: "numeric", month: "short", day: "numeric" })}</time>
                         : "—"}
                     </td>
                   </tr>
