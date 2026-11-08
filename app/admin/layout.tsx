@@ -1,6 +1,6 @@
 "use client";
 import "./admin.css";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAdminStore, type Tab } from "../lib/admin-store";
 
@@ -19,6 +19,26 @@ const NAV: { id: Tab; en: string; ar: string; icon: string; roles?: string[] }[]
   { id: "users", en: "Users & Roles", ar: "المستخدمون والصلاحيات", icon: "users", roles: ["owner"] },
   { id: "activity", en: "Activity Log", ar: "سجل النشاط", icon: "activity", roles: ["owner"] },
 ];
+
+type NewOrderNotice = { orderNumber: number; customerName: string; count: number };
+
+function playAdminOrderTone() {
+  try {
+    const context = new window.AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = 880;
+    gain.gain.setValueAtTime(0.001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.18, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.38);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.4);
+    window.setTimeout(() => { void context.close(); }, 500);
+  } catch {}
+}
 
 function NavIcon({ name }: { name: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -47,6 +67,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { admin, setAdmin, activeTab, setActiveTab, sidebarOpen, toggleSidebar, logout, lang, setLang } = useAdminStore();
   const pathname = usePathname();
   const isLoginPage = pathname === "/admin/login";
+  const [newOrderNotice, setNewOrderNotice] = useState<NewOrderNotice | null>(null);
+  const [newOrderCount, setNewOrderCount] = useState(0);
+  const lastSeenOrderNumber = useRef<number | null>(null);
+  const activeTabRef = useRef(activeTab);
+  const noticeTimer = useRef<number | null>(null);
+  activeTabRef.current = activeTab;
 
   useEffect(() => {
     if (isLoginPage) return;
@@ -55,6 +81,63 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .then((d) => setAdmin(d.admin))
       .catch(() => { window.location.href = "/admin/login"; });
   }, [isLoginPage, setAdmin]);
+
+  useEffect(() => {
+    if (isLoginPage || !admin) return;
+    let stopped = false;
+    const pollOrders = async () => {
+      try {
+        const response = await fetch("/api/admin/orders?limit=100", { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (stopped) return;
+        const orders = Array.isArray(data.items) ? data.items : [];
+        setNewOrderCount(orders.filter((order: { status?: string }) => order.status === "new").length);
+        const highest = orders.reduce((max: number, order: { orderNumber?: number }) => Math.max(max, Number(order.orderNumber) || 0), 0);
+        if (lastSeenOrderNumber.current === null) {
+          lastSeenOrderNumber.current = highest;
+          return;
+        }
+        const lastSeen = lastSeenOrderNumber.current;
+        const freshOrders = orders
+          .filter((order: { orderNumber?: number }) => (Number(order.orderNumber) || 0) > lastSeen)
+          .sort((a: { orderNumber?: number }, b: { orderNumber?: number }) => (Number(a.orderNumber) || 0) - (Number(b.orderNumber) || 0));
+        if (highest > lastSeen) lastSeenOrderNumber.current = highest;
+        if (!freshOrders.length) return;
+        const newest = freshOrders[freshOrders.length - 1];
+        const notice: NewOrderNotice = {
+          orderNumber: Number(newest.orderNumber) || 0,
+          customerName: newest.customerName || (lang === "ar" ? "عميل جديد" : "New customer"),
+          count: freshOrders.length,
+        };
+        setNewOrderNotice(notice);
+        if (activeTabRef.current !== "orders") playAdminOrderTone();
+        if ("Notification" in window && Notification.permission === "granted") {
+          const desktopNotice = new Notification(lang === "ar" ? "طلب جديد من جاهز" : "New JAHEZ order", {
+            body: "#" + notice.orderNumber + " · " + notice.customerName,
+            tag: "jahez-order-" + notice.orderNumber,
+          });
+          desktopNotice.onclick = () => {
+            window.focus();
+            setActiveTab("orders");
+            desktopNotice.close();
+          };
+        }
+        if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+        noticeTimer.current = window.setTimeout(() => setNewOrderNotice(null), 12000);
+      } catch {}
+    };
+    void pollOrders();
+    const timer = window.setInterval(() => { void pollOrders(); }, 8000);
+    const onVisibility = () => { if (document.visibilityState === "visible") void pollOrders(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibility);
+      if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+    };
+  }, [admin?.id, isLoginPage, lang, setActiveTab]);
 
   if (isLoginPage) return <>{children}</>;
 
@@ -106,10 +189,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span>{english ? "JAHEZ / OPERATIONS" : "جاهز / الإدارة"}</span>
             <strong>{title ? (english ? title.en : title.ar) : "Overview"}</strong>
           </div>
-          <div className="jahez-workspace-pill"><span />{english ? "Admin workspace" : "مساحة الإدارة"}</div>
+          <div className="jahez-workspace-pill"><span />{english ? "Admin workspace" : "مساحة الإدارة"}{newOrderCount > 0 && <b className="jahez-order-count">{newOrderCount}</b>}</div>
         </header>
         <main className="jahez-admin-content">
           {activeTab === "overview" && <h1 className="jahez-page-title">{english ? "Overview" : "نظرة عامة"}</h1>}
+          {newOrderNotice && (
+            <div className="jahez-order-toast" role="status" dir={english ? "ltr" : "rtl"}>
+              <button className="jahez-toast-close" onClick={() => setNewOrderNotice(null)} aria-label={english ? "Dismiss notification" : "إغلاق التنبيه"}>×</button>
+              <strong>{english ? (newOrderNotice.count > 1 ? newOrderNotice.count + " new orders" : "New order received") : (newOrderNotice.count > 1 ? newOrderNotice.count + " طلبات جديدة" : "وصلك طلب جديد")}</strong>
+              <span>#{newOrderNotice.orderNumber} · {newOrderNotice.customerName}</span>
+              <button className="jahez-toast-action" onClick={() => { setNewOrderNotice(null); setActiveTab("orders"); }}>
+                {english ? "View orders" : "عرض الطلبات"}
+              </button>
+            </div>
+          )}
           {children}
         </main>
       </div>
