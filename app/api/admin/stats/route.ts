@@ -52,12 +52,15 @@ export async function GET(request: NextRequest) {
 
   return json({
     ok: true,
-    todayRevenue: todayRevenueResult._sum.total || 0,
-    monthRevenue: monthRevenueResult._sum.total || 0,
+    todayRevenue: Math.round(Number(todayRevenueResult._sum.total || 0)) / 100,
+    monthRevenue: Math.round(Number(monthRevenueResult._sum.total || 0)) / 100,
     todayOrders,
     newOrders,
     totalCustomers,
     onlineDrivers,
-    recentOrders,
+    recentOrders: recentOrders.map((order) => ({
+      ...order,
+      total: Math.round(Number(order.total || 0)) / 100,
+    })),
   });
 }
