@@ -68,7 +68,11 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Date(dateStr).toLocaleString("ar-EG-u-nu-latn", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Cairo" });
+}
+
+function formatEgp(value: number) {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value) || 0);
 }
 
 function playBeep() {
@@ -208,13 +212,13 @@ export function OrdersTab() {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
           {[
             { label: "الطلبات", value: summary.count, color: "#0a2d1d" },
-            { label: "الإيرادات", value: summary.totalRevenue.toLocaleString("ar-EG") + " ج.م", color: "#16a34a" },
-            { label: "متوسط الطلب", value: Math.round(summary.avgOrder).toLocaleString("ar-EG") + " ج.م", color: "#ca8a04" },
+            { label: "الإيرادات", value: formatEgp(summary.totalRevenue) + " ج.م", color: "#16a34a" },
+            { label: "متوسط الطلب", value: formatEgp(summary.avgOrder) + " ج.م", color: "#ca8a04" },
             { label: "مكتمل", value: summary.deliveredCount, color: "#059669" },
             { label: "ملغي", value: summary.cancelledCount, color: "#dc2626" },
           ].map((s, i) => (
             <div key={i} className="rounded-xl border border-gray-100 bg-white p-3 text-center shadow-sm">
-              <div className="text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
+              <div dir="ltr" className="text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
               <div className="mt-1 text-xs text-gray-400">{s.label}</div>
             </div>
           ))}
@@ -267,8 +271,8 @@ export function OrdersTab() {
                   </div>
                   <div className="flex items-center gap-3">
                     <StatusBadge status={order.status} />
-                    <span className="font-bold" style={{ color: "#0a2d1d" }}>{Number(order.total).toLocaleString("ar-EG")} ج.م</span>
-                    <span className="text-xs text-gray-400">{formatDate(order.createdAt)}</span>
+                    <span dir="ltr" className="font-bold" style={{ color: "#0a2d1d" }}>{formatEgp(Number(order.total))} ج.م</span>
+                    <time dir="ltr" className="text-xs text-gray-400">{formatDate(order.createdAt)}</time>
                     <span className="text-gray-400">{isExpanded ? "▲" : "▼"}</span>
                   </div>
                 </div>
@@ -305,7 +309,7 @@ export function OrdersTab() {
                             </a>
                           </div>
                         )}
-                        {order.deliveryFee > 0 && <div className="flex justify-between"><span className="text-gray-400">رسوم التوصيل</span><span className="font-medium">{Number(order.deliveryFee).toLocaleString("ar-EG")} ج.م</span></div>}
+                        {order.deliveryFee > 0 && <div className="flex justify-between"><span className="text-gray-400">رسوم التوصيل</span><span dir="ltr" className="font-medium">{formatEgp(Number(order.deliveryFee))} ج.م</span></div>}
                         {order.driver && <div className="flex justify-between"><span className="text-gray-400">الطيار</span><span className="font-medium">{order.driver.name} ({order.driver.phone})</span></div>}
                       </div>
                     </div>
@@ -325,18 +329,18 @@ export function OrdersTab() {
                               <tr key={item.id} className="border-t border-gray-200">
                                 <td className="py-1.5 text-right">{item.productNameAr || item.productNameEn || "صنف"}</td>
                                 <td className="py-1.5 text-center">{item.quantity}</td>
-                                <td className="py-1.5 text-center">{Number(item.unitPrice).toLocaleString("ar-EG")}</td>
-                                <td className="py-1.5 text-left font-semibold">{Number(item.totalPrice).toLocaleString("ar-EG")} ج.م</td>
+                                <td dir="ltr" className="py-1.5 text-center">{formatEgp(Number(item.unitPrice))} ج.م</td>
+                                <td dir="ltr" className="py-1.5 text-left font-semibold">{formatEgp(Number(item.totalPrice))} ج.م</td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                         <div className="mt-2 space-y-1 border-t border-gray-200 pt-2 text-sm">
-                          <div className="flex justify-between"><span className="text-gray-400">المجموع الفرعي</span><span>{Number(order.subtotal).toLocaleString("ar-EG")} ج.م</span></div>
-                          <div className="flex justify-between"><span className="text-gray-400">رسوم التوصيل</span><span>{Number(order.deliveryFee).toLocaleString("ar-EG")} ج.م</span></div>
-                          {order.discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم</span><span>-{Number(order.discount).toLocaleString("ar-EG")} ج.م</span></div>}
+                          <div className="flex justify-between"><span className="text-gray-400">المجموع الفرعي</span><span dir="ltr">{formatEgp(Number(order.subtotal))} ج.م</span></div>
+                          <div className="flex justify-between"><span className="text-gray-400">رسوم التوصيل</span><span dir="ltr">{formatEgp(Number(order.deliveryFee))} ج.م</span></div>
+                          {order.discount > 0 && <div className="flex justify-between text-green-600"><span>الخصم</span><span dir="ltr">-{formatEgp(Number(order.discount))} ج.م</span></div>}
                           <div className="flex justify-between border-t border-gray-200 pt-1 text-lg font-bold" style={{ color: "#0a2d1d" }}>
-                            <span>الإجمالي</span><span>{Number(order.total).toLocaleString("ar-EG")} ج.م</span>
+                            <span>الإجمالي</span><span dir="ltr">{formatEgp(Number(order.total))} ج.م</span>
                           </div>
                         </div>
                       </div>
