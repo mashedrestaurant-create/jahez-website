@@ -214,3 +214,35 @@
   .jahez-stat-grid { grid-template-columns: 1fr; }
   .jahez-workspace-pill { display: none; }
 }
+
+
+.jahez-order-count { min-width: 20px; height: 20px; display: inline-grid; place-items: center; padding: 0 5px; color: #fff; border-radius: 999px; background: #dc4d45; font-size: 10px; font-weight: 800; }
+.jahez-order-toast {
+  position: fixed;
+  top: 26px;
+  right: 32px;
+  z-index: 100;
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  gap: 8px;
+  padding: 19px 20px 17px;
+  color: #1f3329;
+  border: 1px solid #d9e6d8;
+  border-left: 4px solid #4f9167;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 40px #142c1e22;
+  animation: jahez-toast-in .2s ease-out;
+}
+.is-arabic .jahez-order-toast { right: auto; left: 32px; border-left: 1px solid #d9e6d8; border-right: 4px solid #4f9167; }
+.jahez-order-toast strong { font-size: 14px; font-weight: 800; }
+.jahez-order-toast > span { color: #708077; font-size: 12px; }
+.jahez-toast-close { position: absolute; top: 8px; right: 10px; width: 27px; height: 27px; color: #87918a; border: 0; border-radius: 50%; background: transparent; font-size: 20px; cursor: pointer; }
+.is-arabic .jahez-toast-close { right: auto; left: 10px; }
+.jahez-toast-action { justify-self: start; margin-top: 4px; padding: 7px 11px; color: #315e49; border: 1px solid #dae7dc; border-radius: 9px; background: #f3f8f2; font-size: 12px; font-weight: 700; cursor: pointer; }
+.is-arabic .jahez-toast-action { justify-self: end; }
+@keyframes jahez-toast-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 760px) {
+  .jahez-order-toast { top: 94px; right: 16px; }
+  .is-arabic .jahez-order-toast { right: auto; left: 16px; }
+}
