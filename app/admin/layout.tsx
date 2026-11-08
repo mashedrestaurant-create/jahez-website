@@ -126,7 +126,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             return;
           }
         }
-        const lastSeen = lastSeenOrderNumber.current;
+        const lastSeen = lastSeenOrderNumber.current ?? highest;
         const freshOrders = orders
           .filter((order: { orderNumber?: number }) => (Number(order.orderNumber) || 0) > lastSeen)
           .sort((a: { orderNumber?: number }, b: { orderNumber?: number }) => (Number(a.orderNumber) || 0) - (Number(b.orderNumber) || 0));
