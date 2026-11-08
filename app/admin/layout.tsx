@@ -22,21 +22,32 @@ const NAV: { id: Tab; en: string; ar: string; icon: string; roles?: string[] }[]
 
 type NewOrderNotice = { orderNumber: number; customerName: string; count: number };
 
-function playAdminOrderTone() {
+function readLastSeenOrderNumber() {
+  try { return Number(window.localStorage.getItem("jahez-admin-last-seen-order") || 0); } catch { return 0; }
+}
+
+function storeLastSeenOrderNumber(orderNumber: number) {
+  try { window.localStorage.setItem("jahez-admin-last-seen-order", String(orderNumber)); } catch {}
+}
+
+function playAdminOrderTone(context: AudioContext | null) {
   try {
-    const context = new window.AudioContext();
+    if (!context || context.state !== "running") return;
     const oscillator = context.createOscillator();
     const gain = context.createGain();
     oscillator.type = "sine";
-    oscillator.frequency.value = 880;
+    oscillator.frequency.setValueAtTime(880, context.currentTime);
+    oscillator.frequency.setValueAtTime(660, context.currentTime + 0.22);
     gain.gain.setValueAtTime(0.001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.18, context.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.38);
+    gain.gain.exponentialRampToValueAtTime(0.32, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.001, context.currentTime + 0.24);
+    gain.gain.exponentialRampToValueAtTime(0.32, context.currentTime + 0.26);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.48);
     oscillator.connect(gain);
     gain.connect(context.destination);
     oscillator.start();
-    oscillator.stop(context.currentTime + 0.4);
-    window.setTimeout(() => { void context.close(); }, 500);
+    oscillator.stop(context.currentTime + 0.5);
   } catch {}
 }
 
@@ -69,10 +80,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isLoginPage = pathname === "/admin/login";
   const [newOrderNotice, setNewOrderNotice] = useState<NewOrderNotice | null>(null);
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | "unsupported">("default");
   const lastSeenOrderNumber = useRef<number | null>(null);
-  const activeTabRef = useRef(activeTab);
-  const noticeTimer = useRef<number | null>(null);
-  activeTabRef.current = activeTab;
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    if ("Notification" in window) setNotificationPermission(Notification.permission);
+    else setNotificationPermission("unsupported");
+    const unlockAudio = () => {
+      try {
+        if (!audioContextRef.current) audioContextRef.current = new window.AudioContext();
+        void audioContextRef.current.resume();
+      } catch {}
+    };
+    window.addEventListener("pointerdown", unlockAudio);
+    return () => window.removeEventListener("pointerdown", unlockAudio);
+  }, []);
 
   useEffect(() => {
     if (isLoginPage) return;
@@ -95,14 +118,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setNewOrderCount(orders.filter((order: { status?: string }) => order.status === "new").length);
         const highest = orders.reduce((max: number, order: { orderNumber?: number }) => Math.max(max, Number(order.orderNumber) || 0), 0);
         if (lastSeenOrderNumber.current === null) {
-          lastSeenOrderNumber.current = highest;
-          return;
+          const stored = readLastSeenOrderNumber();
+          lastSeenOrderNumber.current = stored > 0 ? stored : highest;
+          if (highest <= lastSeenOrderNumber.current) {
+            storeLastSeenOrderNumber(highest);
+            return;
+          }
         }
         const lastSeen = lastSeenOrderNumber.current;
         const freshOrders = orders
           .filter((order: { orderNumber?: number }) => (Number(order.orderNumber) || 0) > lastSeen)
           .sort((a: { orderNumber?: number }, b: { orderNumber?: number }) => (Number(a.orderNumber) || 0) - (Number(b.orderNumber) || 0));
-        if (highest > lastSeen) lastSeenOrderNumber.current = highest;
+        if (highest > lastSeen) {
+          lastSeenOrderNumber.current = highest;
+          storeLastSeenOrderNumber(highest);
+        }
         if (!freshOrders.length) return;
         const newest = freshOrders[freshOrders.length - 1];
         const notice: NewOrderNotice = {
@@ -111,7 +141,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           count: freshOrders.length,
         };
         setNewOrderNotice(notice);
-        if (activeTabRef.current !== "orders") playAdminOrderTone();
+        playAdminOrderTone(audioContextRef.current);
+        if ("vibrate" in navigator) navigator.vibrate([220, 90, 220]);
         if ("Notification" in window && Notification.permission === "granted") {
           const desktopNotice = new Notification(lang === "ar" ? "طلب جديد من جاهز" : "New JAHEZ order", {
             body: "#" + notice.orderNumber + " · " + notice.customerName,
@@ -123,8 +154,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             desktopNotice.close();
           };
         }
-        if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
-        noticeTimer.current = window.setTimeout(() => setNewOrderNotice(null), 12000);
       } catch {}
     };
     void pollOrders();
@@ -135,7 +164,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       stopped = true;
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisibility);
-      if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
     };
   }, [admin?.id, isLoginPage, lang, setActiveTab]);
 
@@ -189,12 +217,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span>{english ? "JAHEZ / OPERATIONS" : "جاهز / الإدارة"}</span>
             <strong>{title ? (english ? title.en : title.ar) : "Overview"}</strong>
           </div>
+          {notificationPermission === "default" && (
+            <button className="jahez-enable-alerts" onClick={async () => {
+              if ("Notification" in window) setNotificationPermission(await Notification.requestPermission());
+            }}>{english ? "Enable alerts" : "تفعيل إشعارات الجهاز"}</button>
+          )}
           <div className="jahez-workspace-pill"><span />{english ? "Admin workspace" : "مساحة الإدارة"}{newOrderCount > 0 && <b className="jahez-order-count">{newOrderCount}</b>}</div>
         </header>
         <main className="jahez-admin-content">
           {activeTab === "overview" && <h1 className="jahez-page-title">{english ? "Overview" : "نظرة عامة"}</h1>}
           {newOrderNotice && (
-            <div className="jahez-order-toast" role="status" dir={english ? "ltr" : "rtl"}>
+            <div className="jahez-order-toast" role="alert" aria-live="assertive" dir={english ? "ltr" : "rtl"}>
               <button className="jahez-toast-close" onClick={() => setNewOrderNotice(null)} aria-label={english ? "Dismiss notification" : "إغلاق التنبيه"}>×</button>
               <strong>{english ? (newOrderNotice.count > 1 ? newOrderNotice.count + " new orders" : "New order received") : (newOrderNotice.count > 1 ? newOrderNotice.count + " طلبات جديدة" : "وصلك طلب جديد")}</strong>
               <span>#{newOrderNotice.orderNumber} · {newOrderNotice.customerName}</span>

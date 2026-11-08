@@ -246,3 +246,24 @@
   .jahez-order-toast { top: 94px; right: 16px; }
   .is-arabic .jahez-order-toast { right: auto; left: 16px; }
 }
+
+
+.jahez-enable-alerts {
+  padding: 9px 13px;
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  background: #a54132;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.jahez-enable-alerts:hover { background: #863426; }
+.jahez-order-toast { border-color: #e7a08d; border-left-color: #c64c38; box-shadow: 0 18px 48px #4d1e1640; }
+.is-arabic .jahez-order-toast { border-left-color: #d9e6d8; border-right-color: #c64c38; }
+.jahez-order-toast strong { color: #9e2f23; font-size: 17px; }
+@media (max-width: 760px) {
+  .jahez-enable-alerts { max-width: 122px; padding: 8px 9px; font-size: 10px; white-space: normal; line-height: 1.2; }
+}

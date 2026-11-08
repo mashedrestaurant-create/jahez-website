@@ -6,7 +6,7 @@ import type { CartItem } from "../cart-context";
 import { useCatalog } from "../catalog-context";
 import { useCart } from "../cart-context";
 import { formatPrice } from "../data";
-import { formatWhatsAppOrder } from "../whatsapp-message";
+import { buildWhatsAppUrl, formatWhatsAppOrder } from "../whatsapp-message";
 import { normalizeEgyptianMobile } from "../egypt-phone";
 import { trackEvent } from "../event-tracker";
 import { useLanguage } from "../language-context";
@@ -45,6 +45,7 @@ export default function CartPage() {
   const [failedOrderId, setFailedOrderId] = useState<number | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderWhatsAppUrl, setOrderWhatsAppUrl] = useState("");
   const [instapayConfirmation, setInstapayConfirmation] = useState<{
     orderId: number;
     total: number;
@@ -126,6 +127,8 @@ export default function CartPage() {
   const submitOrder = async (event: FormEvent) => {
     event.preventDefault();
     if (submissionRef.current) return;
+    let whatsappTab: Window | null = null;
+    let whatsappTabRedirected = false;
     submissionRef.current = true;
     setError("");
     setFailedOrderId(null);
@@ -219,6 +222,10 @@ export default function CartPage() {
       );
       submissionRef.current = false;
       return;
+    }
+    if (selectedPaymentMethod === "cash" && settings.whatsappNumber.trim()) {
+      whatsappTab = window.open("about:blank", "_blank");
+      if (whatsappTab) whatsappTab.opener = null;
     }
     setSending(true);
     try {
@@ -374,12 +381,11 @@ export default function CartPage() {
       }
       trackEvent("order_placed", undefined, { orderId: p.orderId, method: selectedPaymentMethod, total: confirmedTotal });
       trackEvent("payment_success", undefined, { method: selectedPaymentMethod, total: confirmedTotal, orderId: p.orderId });
-      if (settings.whatsappNumber.trim()) {
-        window.open(
-          `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(orderMessage)}`,
-          "_blank",
-          "noopener,noreferrer",
-        );
+      const customerWhatsAppUrl = buildWhatsAppUrl(settings.whatsappNumber, orderMessage);
+      setOrderWhatsAppUrl(customerWhatsAppUrl || "");
+      if (selectedPaymentMethod === "cash" && whatsappTab && customerWhatsAppUrl) {
+        whatsappTab.location.href = customerWhatsAppUrl;
+        whatsappTabRedirected = true;
       }
       setOrderPlaced(true);
       saveLastOrder({
@@ -411,6 +417,7 @@ export default function CartPage() {
         );
       }
     } finally {
+      if (whatsappTab && !whatsappTabRedirected) whatsappTab.close();
       setSending(false);
       submissionRef.current = false;
     }
@@ -485,6 +492,11 @@ export default function CartPage() {
                     <h2>{isArabic ? "طلبك اتسجل بنجاح" : "We’ve received your order"}</h2>
                     <p>{isArabic ? "رقم طلبك للمتابعة ظاهر هنا، وتفاصيل الطلب بالأسفل." : "Keep your order number for reference. Your order details are below."}</p>
                     <p className="last-order-id"><bdi dir="ltr">#{lastOrder.orderId}</bdi></p>
+                    {orderWhatsAppUrl && (
+                      <a className="button button-whatsapp" href={orderWhatsAppUrl} target="_blank" rel="noreferrer">
+                        {isArabic ? "إرسال الطلب للمطعم على واتساب" : "Send order to the restaurant on WhatsApp"}
+                      </a>
+                    )}
                   </>
                 ) : (
                   <>
@@ -637,7 +649,7 @@ export default function CartPage() {
                   </div>
                   <a
                     className="button whatsapp-submit"
-                    href={settings.whatsappNumber.trim() ? `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(instapayConfirmation.message)}` : "/contact"}
+                    href={buildWhatsAppUrl(settings.whatsappNumber, instapayConfirmation.message) || "/contact"}
                     target="_blank"
                     rel="noreferrer"
                     onClick={clear}
