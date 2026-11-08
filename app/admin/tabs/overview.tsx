@@ -1,19 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
-  new: { label: "جديد", color: "#2563eb", bg: "#eff6ff" },
-  confirmed: { label: "مؤكد", color: "#ca8a04", bg: "#fefce8" },
-  preparing: { label: "قيد التحضير", color: "#ea580c", bg: "#fff7ed" },
-  ready: { label: "چاهِز", color: "#16a34a", bg: "#f0fdf4" },
-  out_for_delivery: { label: "قيد التوصيل", color: "#9333ea", bg: "#faf5ff" },
-  completed: { label: "مكتمل", color: "#059669", bg: "#ecfdf5" },
-  cancelled: { label: "ملغي", color: "#dc2626", bg: "#fef2f2" },
-};
+import { useAdminStore } from "../../lib/admin-store";
 
 type StatsData = {
   todayRevenue: number;
+  monthRevenue: number;
   todayOrders: number;
   newOrders: number;
   totalCustomers: number;
@@ -29,30 +21,23 @@ type StatsData = {
   }>;
 };
 
-function StatusBadge({ status }: { status: string }) {
-  const s = STATUS_MAP[status] || { label: status, color: "#6b7280", bg: "#f3f4f6" };
-  return (
-    <span
-      style={{ color: s.color, backgroundColor: s.bg }}
-      className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-    >
-      {s.label}
-    </span>
-  );
-}
+const STATUS_MAP: Record<string, { en: string; ar: string; color: string; bg: string }> = {
+  new: { en: "New", ar: "جديد", color: "#2563eb", bg: "#eff6ff" },
+  confirmed: { en: "Confirmed", ar: "مؤكد", color: "#7c3aed", bg: "#f3e8ff" },
+  preparing: { en: "Preparing", ar: "قيد التحضير", color: "#ea580c", bg: "#fff7ed" },
+  ready: { en: "Ready", ar: "جاهز", color: "#a16207", bg: "#fef9c3" },
+  out_for_delivery: { en: "Out for delivery", ar: "قيد التوصيل", color: "#9333ea", bg: "#faf5ff" },
+  completed: { en: "Completed", ar: "مكتمل", color: "#059669", bg: "#ecfdf5" },
+  cancelled: { en: "Cancelled", ar: "ملغي", color: "#dc2626", bg: "#fef2f2" },
+};
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("ar-EG", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function money(value: number, lang: "ar" | "en") {
+  return "EGP " + Number(value || 0).toLocaleString(lang === "en" ? "en-EG" : "ar-EG");
 }
 
 export function OverviewTab() {
+  const lang = useAdminStore((s) => s.lang);
+  const english = lang === "en";
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -61,10 +46,7 @@ export function OverviewTab() {
   useEffect(() => {
     mounted.current = true;
     fetch("/api/admin/stats")
-      .then((r) => {
-        if (!r.ok) throw new Error("fetch");
-        return r.json();
-      })
+      .then((r) => { if (!r.ok) throw new Error("fetch"); return r.json(); })
       .then((data) => {
         if (!mounted.current) return;
         setStats(data);
@@ -72,137 +54,63 @@ export function OverviewTab() {
       })
       .catch(() => {
         if (!mounted.current) return;
-        setError("تعذر تحميل البيانات");
+        setError(english ? "Could not load dashboard data." : "تعذر تحميل بيانات لوحة الإدارة.");
         setLoading(false);
       });
     return () => { mounted.current = false; };
-  }, []);
+  }, [english]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-lg text-gray-400">جاري تحميل الإحصائيات...</div>
-      </div>
-    );
-  }
+  if (loading) return <div className="jahez-dashboard-message">{english ? "Loading dashboard..." : "جاري تحميل لوحة الإدارة..."}</div>;
+  if (error || !stats) return <div className="jahez-dashboard-message is-error">{error || (english ? "Something went wrong." : "حدث خطأ غير متوقع.")}</div>;
 
-  if (error || !stats) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-lg text-red-500">{error || "خطأ غير معروف"}</div>
-      </div>
-    );
-  }
-
-  const statCards = [
-    {
-      label: "إيرادات اليوم",
-      value: `${stats.todayRevenue.toLocaleString("ar-EG")} ج.م`,
-      icon: "💰",
-    },
-    {
-      label: "طلبات اليوم",
-      value: stats.todayOrders.toLocaleString("ar-EG"),
-      icon: "📦",
-    },
-    {
-      label: "طلبات جديدة",
-      value: stats.newOrders.toLocaleString("ar-EG"),
-      icon: "🆕",
-      pulse: stats.newOrders > 0,
-    },
-    {
-      label: "إجمالي العملاء",
-      value: stats.totalCustomers.toLocaleString("ar-EG"),
-      icon: "👥",
-    },
-    {
-      label: "الطيارين المتصلين",
-      value: stats.onlineDrivers.toLocaleString("ar-EG"),
-      icon: "🏍️",
-    },
+  const cards = [
+    { label: english ? "Today's Revenue" : "إيرادات اليوم", value: money(stats.todayRevenue, lang), tone: "green" },
+    { label: english ? "Month's Revenue" : "إيرادات الشهر", value: money(stats.monthRevenue, lang), tone: "blue" },
+    { label: english ? "Today's Orders" : "طلبات اليوم", value: Number(stats.todayOrders || 0).toLocaleString(english ? "en-EG" : "ar-EG"), tone: "orange" },
+    { label: english ? "New Orders" : "طلبات جديدة", value: Number(stats.newOrders || 0).toLocaleString(english ? "en-EG" : "ar-EG"), tone: "purple" },
   ];
 
   return (
-    <div dir="rtl" className="space-y-6 p-1">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-5">
-        {statCards.map((card) => (
-          <div
-            key={card.label}
-            className="relative rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-          >
-            <div className="mb-2 text-sm text-gray-500">{card.label}</div>
-            <div
-              className="text-2xl font-bold"
-              style={{ color: "#0a2d1d" }}
-            >
-              {card.value}
-            </div>
-            {card.pulse && (
-              <span className="absolute left-3 top-3 flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ backgroundColor: "#ef4444" }} />
-                <span className="relative inline-flex h-3 w-3 rounded-full" style={{ backgroundColor: "#ef4444" }} />
-              </span>
-            )}
-            <div className="mt-1 text-xl">{card.icon}</div>
-          </div>
+    <section className="jahez-dashboard" dir={english ? "ltr" : "rtl"}>
+      <div className="jahez-stat-grid">
+        {cards.map((card) => (
+          <article key={card.label} className={"jahez-stat-card tone-" + card.tone}>
+            <span>{card.label}</span>
+            <strong>{card.value}</strong>
+          </article>
         ))}
       </div>
 
-      <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
-        <div className="border-b border-gray-100 px-5 py-4">
-          <h2 className="text-lg font-bold" style={{ color: "#0a2d1d" }}>
-            آخر الطلبات
-          </h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-right text-sm">
+      <section className="jahez-recent-orders">
+        <h2>{english ? "Recent Orders" : "أحدث الطلبات"}</h2>
+        <div className="jahez-orders-table-wrap">
+          <table className="jahez-orders-table">
             <thead>
-              <tr className="border-b border-gray-100 text-gray-500">
-                <th className="px-5 py-3 font-medium">رقم الطلب</th>
-                <th className="px-5 py-3 font-medium">العميل</th>
-                <th className="px-5 py-3 font-medium">الهاتف</th>
-                <th className="px-5 py-3 font-medium">الحالة</th>
-                <th className="px-5 py-3 font-medium">الإجمالي</th>
-                <th className="px-5 py-3 font-medium">التاريخ</th>
+              <tr>
+                <th>#</th>
+                <th>{english ? "Customer" : "العميل"}</th>
+                <th>{english ? "Amount" : "المبلغ"}</th>
+                <th>{english ? "Status" : "الحالة"}</th>
               </tr>
             </thead>
             <tbody>
               {stats.recentOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-gray-400">
-                    لا يوجد طلبات بعد
-                  </td>
-                </tr>
-              ) : (
-                stats.recentOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-gray-50 transition-colors hover:bg-gray-50/50"
-                  >
-                    <td className="px-5 py-3 font-mono font-semibold" style={{ color: "#0a2d1d" }}>
-                      #{order.orderNumber}
-                    </td>
-                    <td className="px-5 py-3">{order.customerName}</td>
-                    <td className="px-5 py-3" dir="ltr">
-                      {order.customerPhone}
-                    </td>
-                    <td className="px-5 py-3">
-                      <StatusBadge status={order.status} />
-                    </td>
-                    <td className="px-5 py-3 font-semibold" style={{ color: "#0a2d1d" }}>
-                      {Number(order.total).toLocaleString("ar-EG")} ج.م
-                    </td>
-                    <td className="px-5 py-3 text-gray-500">
-                      {formatDate(order.createdAt)}
-                    </td>
+                <tr><td colSpan={4} className="jahez-empty-orders">{english ? "No orders yet" : "لا توجد طلبات بعد"}</td></tr>
+              ) : stats.recentOrders.slice(0, 5).map((order) => {
+                const status = STATUS_MAP[order.status];
+                return (
+                  <tr key={order.id}>
+                    <td className="jahez-order-number">JH-{String(order.orderNumber).padStart(6, "0")}</td>
+                    <td>{order.customerName || (english ? "Guest" : "عميل")}</td>
+                    <td>{money(order.total, lang)}</td>
+                    <td><span className="jahez-status-badge" style={{ color: status?.color || "#6b7280", background: status?.bg || "#f3f4f6" }}>{status ? (english ? status.en : status.ar) : order.status}</span></td>
                   </tr>
-                ))
-              )}
+                );
+              })}
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </section>
+    </section>
   );
 }
