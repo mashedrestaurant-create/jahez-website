@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     orderBy: { createdAt: "desc" },
     page,
   });
-  const items = data.items.map((customer) => ({
+  const items = data.items.map((customer: { totalSpent?: number | string | null; [key: string]: unknown }) => ({
     ...customer,
     totalSpent: Math.round(Number(customer.totalSpent || 0)) / 100,
   }));
