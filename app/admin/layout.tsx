@@ -1,4 +1,5 @@
 "use client";
+import "./admin.css";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAdminStore, type Tab } from "../lib/admin-store";
